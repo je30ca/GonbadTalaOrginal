@@ -1,0 +1,157 @@
+﻿@model DataAccess.Models.Khadem
+
+
+@{
+    ViewData["Title"] = "ثبت خادم جدید";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 p-4" style="border-radius: 15px; background-color: #f8f9fa;">
+                <h3 class="fw-bold text-secondary mb-4 text-center">ثبت اطلاعات خادم جدید</h3>
+<form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+    <div class="row">
+        <!-- ردیف اول -->
+        <div class="col-md-6 mb-3 text-right">
+            <label class="control-label">کد پرسنلی</label>
+            <input asp-for="PersonalCode" class="form-control text-center" placeholder="مثال: 101" />
+            <span asp-validation-for="PersonalCode" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3 text-right">
+            <label class="control-label">نام و نام خانوادگی</label>
+            <input type="text" name="fullName" class="form-control" placeholder="نام و نام خانوادگی خادم" required />
+        </div>
+
+        <!-- ردیف دوم -->
+        <div class="col-md-6 mb-3 text-right">
+            <label class="control-label">شماره همراه (نام کاربری)</label>
+            <input asp-for="PhoneNumber" class="form-control text-center" placeholder="09120000000" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3 text-right">
+            <label class="control-label">رمز عبور</label>
+            <input asp-for="Password" type="password" class="form-control text-center" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- ردیف سوم -->
+        <div class="col-md-6 mb-3 text-right">
+            <label class="control-label">تخصص</label>
+            <input asp-for="Specialization" class="form-control" placeholder="مثال: مربی، پذیرش" />
+        </div>
+        <div class="col-md-6 mb-3 text-right">
+            <label class="control-label">شیفت کاری</label>
+            <select asp-for="Shift" class="form-control">
+                <option value="">انتخاب کنید...</option>
+                <option value="1">شیفت ۱ (صبح)</option>
+                <option value="2">شیفت ۲ (عصر)</option>
+                <option value="3">شیفت ۳ (شب)</option>
+            </select>
+        </div>
+
+        <!-- ردیف چهارم (تکی یا در کنار فیلد دیگر) -->
+        <div class="col-md-6 mb-3 text-right">
+                            <label asp-for="WorkingDay" class="form-label">روز کاری</label>
+                            <select asp-for="WorkingDay" class="form-select rounded-pill border-0 shadow-sm">
+                                <option value="شنبه">شنبه</option>
+                                <option value="یکشنبه">یکشنبه</option>
+                                <option value="دوشنبه">دوشنبه</option>
+                                <option value="سه شنبه">سه‌شنبه</option>
+                                <option value="چهارشنبه">چهارشنبه</option>
+                                <option value="پنجشنبه">پنجشنبه</option>
+                                <option value="جمعه">جمعه</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- دکمه‌ها -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-success px-5 shadow-sm">ذخیره خادم</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-5">بازگشت به لیست</a>
+        </div>
+    </div>
+</form>
+</div>
+</div>
+    </div>
+</div>
+
+
+@* <div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 p-4" style="border-radius: 15px; background-color: #f8f9fa;">
+                <h3 class="fw-bold text-secondary mb-4 text-center">ثبت اطلاعات خادم جدید</h3>
+                
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PersonalCode" class="form-label">کد پرسنلی</label>
+                            <input asp-for="PersonalCode" class="form-control rounded-pill border-0 shadow-sm" required />
+                            <span asp-validation-for="PersonalCode" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FullName" class="form-label">نام و نام خانوادگی</label>
+                            <input asp-for="FullName" class="form-control rounded-pill border-0 shadow-sm" required />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">شماره همراه (نام کاربری)</label>
+                            <input asp-for="PhoneNumber" class="form-control rounded-pill border-0 shadow-sm" required />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Password" class="form-label">رمز عبور</label>
+                            <input asp-for="Password" type="password" class="form-control rounded-pill border-0 shadow-sm" required />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Specialization" class="form-label">تخصص</label>
+                            <input asp-for="Specialization" class="form-control rounded-pill border-0 shadow-sm" placeholder="مثال: مربی، پذیرش، پشتیبانی" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Shift" class="form-label">شیفت کاری</label>
+                            <select asp-for="Shift" class="form-control">
+                                <option value="">انتخاب کنید...</option>
+                                <option value="1">شیفت ۱ (صبح)</option>
+                                <option value="2">شیفت ۲ (عصر)</option>
+                                <option value="3">شیفت ۳ (شب)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="WorkingDay" class="form-label">روز کاری</label>
+                            <select asp-for="WorkingDay" class="form-select rounded-pill border-0 shadow-sm">
+                                <option value="شنبه">شنبه</option>
+                                <option value="یکشنبه">یکشنبه</option>
+                                <option value="دوشنبه">دوشنبه</option>
+                                <option value="سه شنبه">سه‌شنبه</option>
+                                <option value="چهارشنبه">چهارشنبه</option>
+                                <option value="پنجشنبه">پنجشنبه</option>
+                                <option value="جمعه">جمعه</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm">ذخیره خادم</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">بازگشت به لیست</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> *@

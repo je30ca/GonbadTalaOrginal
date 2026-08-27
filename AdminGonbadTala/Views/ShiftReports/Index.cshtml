@@ -1,0 +1,119 @@
+﻿@model IEnumerable<DataAccess.Models.ShiftReport>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ReportDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Shift)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Subject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuranActivity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AhkamActivity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GameActivity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PoemActivity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StoryActivity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CraftActivity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalParticipants)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegularCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TravelerCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PresentKhads)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Khadem)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReportDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Shift)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subject)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuranActivity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AhkamActivity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GameActivity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PoemActivity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StoryActivity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CraftActivity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalParticipants)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegularCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TravelerCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PresentKhads)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Khadem.FirstName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

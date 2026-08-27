@@ -1,0 +1,461 @@
+:root {
+  --bg: #fffaf3;
+  --accent: #ff7f50;
+  --accent-soft: #ffe0c8;
+  --text-main: #333333;
+  --text-muted: #777777;
+  --border-soft: #f1d7b9;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --shadow-soft: 0 8px 18px rgba(0, 0, 0, 0.06);
+  --transition-fast: 0.2s ease-out;
+  --header-height: 72px;
+  --footer-height: 120px;
+  --max-width: 980px;
+}
+
+*, 
+*::before, 
+*::after {
+  box-sizing: border-box;
+}
+
+html, 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "IRANSans", "Segoe UI",
+    sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Header */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 250, 243, 0.98),
+    rgba(255, 237, 215, 0.96)
+  );
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.header-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  height: var(--header-height);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Logo */
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 20% 20%, #ffb347, #ff7f50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+  font-size: 22px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.logo-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.logo-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Nav */
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  font-size: 12px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--text-main);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.7);
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast), box-shadow var(--transition-fast),
+    color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: #ffffff;
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+.nav-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.nav-primary:hover {
+  background: #ff6a32;
+  box-shadow: 0 10px 20px rgba(255, 127, 80, 0.28);
+}
+
+/* Main placeholder */
+
+.placeholder-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+}
+
+.placeholder-card {
+  width: 100%;
+  max-width: calc(var(--max-width) - 32px);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px;
+  text-align: center;
+}
+
+.placeholder-card h1 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.placeholder-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Footer */
+
+.site-footer {
+  background: #fff5e6;
+  border-top: 1px solid var(--border-soft);
+}
+
+.footer-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 10px 14px 6px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.footer-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.footer-block h2 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c26025;
+}
+
+.footer-block p,
+.footer-block a {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.footer-contact {
+  text-align: left;
+}
+
+.footer-contact a {
+  display: block;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.footer-bottom {
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+  text-align: center;
+  padding: 4px 10px 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Mobile tweaks */
+
+@media (max-width: 640px) {
+  :root {
+    --header-height: 68px;
+  }
+
+  .header-inner {
+    padding-inline: 10px;
+  }
+
+  .logo-title {
+    font-size: 15px;
+  }
+
+  .logo-subtitle {
+    font-size: 10px;
+  }
+
+  .main-nav {
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding-inline: 8px;
+  }
+
+  .placeholder-card {
+    padding: 14px 12px;
+  }
+
+  .placeholder-card h1 {
+    font-size: 16px;
+  }
+
+  .placeholder-card p {
+    font-size: 12px;
+  }
+
+  .footer-inner {
+    flex-wrap: wrap;
+  }
+
+  .footer-block {
+    flex: 1 1 33%;
+  }
+
+
+ }
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+}
+
+/* کل جدول */
+.custom-orange-table {
+    min-width: 700px !important;
+    border-collapse: collapse !important;
+    box-shadow: 0 4px 14px rgba(255, 138, 42, 0.15) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+/* هدر */
+.custom-orange-table thead th {
+    background: linear-gradient(135deg, #FF8A2A, #FF6A00) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    padding: 14px !important;
+    border: none !important;
+}
+
+/* ردیف‌ها */
+.custom-orange-table tbody td {
+    padding: 12px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+/* زبرا */
+.custom-orange-table tbody tr:nth-child(even) td {
+    background-color: #FFE8D4 !important;
+}
+
+/* Hover */
+.custom-orange-table tbody tr:hover td {
+    background-color: #FFE0C2 !important;
+    transition: 0.2s ease !important;
+}
+
+/* لینک‌ها */
+.custom-orange-table td a {
+    color: #FF6A00 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+.custom-orange-table td a:hover {
+    text-decoration: underline !important;
+}
+/* رنگ نارنجی لوگو برای دکمه ثبت */
+.btn-gold-orange {
+    background-color: #FF6A00 !important; /* رنگ نارنجی لوگو */
+    color: antiquewhite !important;
+    border: none !important;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-gold-orange:hover {
+        background-color: #e67e00 !important; /* کمی تیره تر هنگام هاور */
+        color: white !important;
+    }
+
+/* استایل دکمه مشاهده لیست */
+.btn-list-view {
+    border-color: #888 !important;
+    color: #555 !important;
+    background-color: antiquewhite !important;
+}
+
+    .btn-list-view:hover {
+        background-color: #f0f0f0 !important;
+        color: #333 !important;
+    }
+/* استایل جدول خاکستری سفارشی */
+.custom-gray-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+    /* رنگ هدر جدول - خاکستری تیره */
+    .custom-gray-table thead {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .custom-gray-table th {
+        font-weight: bold;
+        padding: 12px;
+        border: none;
+        text-align: center;
+    }
+
+    /* رنگ ردیف‌های فرد - خاکستری بسیار روشن */
+    .custom-gray-table tbody tr:nth-of-type(odd) {
+        background-color: #f8f9fa;
+    }
+
+    /* رنگ ردیف‌های زوج - کمی تیره‌تر */
+    .custom-gray-table tbody tr:nth-of-type(even) {
+        background-color: #e9ecef;
+    }
+
+    /* افکت هاور هنگام رفتن موس روی ردیف‌ها */
+    .custom-gray-table tbody tr:hover {
+        background-color: #dee2e6 !important;
+        transition: background-color 0.2s ease;
+    }
+
+    .custom-gray-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+        text-align: center;
+    }
+/* استایل کاردهای پاستیلی */
+
+/* ۱. حاضر در سالن (صورتی/قرمز پاستیلی) */
+.card-pastel-danger {
+    background-color: #ffccd5 !important;
+    color: #a4133c !important;
+    border: 1px solid #ffb3c1 !important;
+}
+
+/* ۲. کل ورودی شیفت (آبی پاستیلی) */
+.card-pastel-primary {
+    background-color: #d0ebff !important;
+    color: #004085 !important;
+    border: 1px solid #a5d8ff !important;
+}
+
+/* ۳. مسافر (زرد/نارنجی پاستیلی) */
+.card-pastel-warning {
+    background-color: #ffe8cc !important;
+    color: #856404 !important;
+    border: 1px solid #ffd8a8 !important;
+}
+
+/* ۴. بومی (سبز پاستیلی) */
+.card-pastel-success {
+    background-color: #d3f9d8 !important;
+    color: #0f5132 !important;
+    border: 1px solid #b2f2bb !important;
+}
+
+/* استایل عمومی برای زیباتر شدن کاردها */
+.card-pastel-danger, .card-pastel-primary, .card-pastel-warning, .card-pastel-success {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    font-weight: bold;
+}
+/* سطر پایان وقت (قرمز پاستیلی ملایم) */
+tr.overtime-row {
+    background-color: #fcdad7 !important; /* قرمز پاستیلی */
+    color: #842029 !important; /* متن زرشکی تیره برای خوانایی */
+}
+
+    /* افکت هاور برای سطرهای هشدار */
+    tr.overtime-row:hover {
+        background-color: #fbcbc7 !important;
+    }
+
+/* افکت چشمک‌زن ملایم برای نشانگر پایان وقت */
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+

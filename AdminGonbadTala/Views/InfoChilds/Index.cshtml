@@ -1,0 +1,144 @@
+﻿@model IEnumerable<DataAccess.Models.InfoChild>
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+   
+@{
+    
+
+    string CalculateAge(DateTime? birthDate)
+    {
+        var today = DateTime.Today;
+        var years = today.Year - birthDate?.Year;
+        var months = today.Month - birthDate?.Month;
+        var days = today.Day - birthDate?.Day;
+    
+        if (days < 0)
+        {
+            months--;
+            days += DateTime.DaysInMonth(today.Year, today.Month - 1 == 0 ? 12 : today.Month - 1);
+        }
+    
+        if (months < 0)
+        {
+            years--;
+            months += 12;
+        }
+    
+        return $"{years} سال و {months} ماه  ";
+    }
+}
+<h1>لیست کودکان</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">ثبت کودک جدید</a>
+</p>
+<div class="table-wrapper">
+    <table class="table custom-orange-table">
+        <thead>
+            <tr>
+                <th>
+                    شماره تماس
+                </th>
+                <th>
+                    نام
+                </th>
+                <th>
+                    نام خانوادگی
+                </th>
+                <th>
+                    سن
+                </th>
+                <th>
+                    تاریخ و ساعت ورود
+                </th>
+                <th>
+                    ساعت خروج
+                </th>
+                <th>وضعیت</th>
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.IsTimeUp ? "table-danger" : "")">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LName)
+                    </td>
+                    <td>
+                        <span class="text-success fw-bold">@CalculateAge(item.BirthDate) </span>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RegisterDate)
+                    </td>
+
+                    <td id="exit-time-@item.Id">
+                        @if (item.ExitTime.HasValue)
+                        {
+                            <span class="text-success fw-bold">@item.ExitTime.Value.ToString("HH:mm")</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.ExitTime.HasValue)
+                        {
+                            <span class="badge bg-success">خارج شده</span>
+                        }
+                        else if (item.IsTimeUp)
+                        {
+                            <span class="badge bg-danger">زمان تمام شد!</span>
+                        }
+                        else
+                        {
+                            <span class="text-black">@(Math.Round(item.RemainingMinutes)) دقیقه باقی‌مانده</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> |
+                        @* <a asp-action="Details" asp-route-id="@item.Id">اطلاعات</a> | *@
+                        <a asp-action="Delete" asp-route-id="@item.Id">حذف</a>|
+                        <form asp-action="Exit" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger">خروج</button>
+                        </form>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script>
+        setInterval(function () {
+            // این کد می‌تواند یک درخواست AJAX به سرور بزند تا لیست را چک کند
+            // یا خیلی ساده‌تر، صفحه را هر ۲ دقیقه رفرش کند:
+            location.reload();
+        }, 60000); // هر ۶۰ ثانیه
+
+        // برای پخش صدای آلارم اگر سطری قرمز شد
+        $(document).ready(function() {
+            if ($('.table-danger').length > 0) {
+                var audio = new Audio('/sounds/alarm.mp3');
+                audio.play();
+            }
+        });
+
+     
+
+    </script>
+}

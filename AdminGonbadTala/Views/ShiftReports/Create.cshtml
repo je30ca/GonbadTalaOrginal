@@ -1,0 +1,300 @@
+﻿@model DataAccess.Models.ShiftReport
+
+@{
+    ViewData["Title"] = "ثبت گزارش جامع شیفت";
+}
+
+<style>
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .form-header {
+        border-bottom: 1px solid #f8fafc;
+        padding: 1.25rem 1.75rem;
+        background-color: #faf5ff;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #6b21a8;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-section-card {
+        background-color: #ffffff;
+        border: 1px solid #f1f5f9;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-section-card:hover {
+            border-color: #e9d5ff;
+        }
+
+    .form-label-custom {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.375rem;
+    }
+
+    .form-control-custom {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.6rem 0.85rem;
+        font-size: 0.925rem;
+        color: #1e293b;
+        background-color: #fafafa;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .form-control-custom:focus {
+            border-color: #c084fc;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.15);
+            outline: none;
+        }
+
+    /* چیپ‌های انتخاب شیفت */
+    .shift-chip {
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        color: #475569;
+        border-radius: 10px;
+        padding: 0.45rem 1.1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .shift-chip.active {
+            background-color: #ddd6fe;
+            border-color: #c4b5fd;
+            color: #5b21b6;
+        }
+
+    /* دکمه ثبت اصلی */
+    .btn-submit-green-pastel {
+        background-color: #a7f3d0;
+        color: #064e3b;
+        border-radius: 12px;
+        padding: 0.8rem;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-submit-green-pastel:hover {
+            background-color: #6ee7b7;
+            color: #022c22;
+        }
+</style>
+
+<div class="row justify-content-center my-4">
+    <div class="col-xl-9 col-lg-10">
+        <div class="form-card">
+
+            <!-- هدر فرم -->
+            <div class="form-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1">📋 ثبت گزارش جامع عملکرد شیفت</h5>
+                    <p class="text-muted small mb-0">اطلاعات فعالیت‌ها، برنامه‌های اجرا شده و آمار شیفت بازیگاه را وارد کنید</p>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-3 px-3">
+                    بازگشت به لیست
+                </a>
+            </div>
+
+            <div class="p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- بخش اول: اطلاعات عمومی شیفت -->
+                    <div class="form-section-card">
+                        <div class="section-title">
+                            <span>📌</span> اطلاعات عمومی شیفت
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="KhademId" class="form-label-custom">متصدی گزارش</label>
+                                <select asp-for="KhademId" class="form-select form-control-custom" asp-items="ViewBag.KhademId">
+                                    <option value="">انتخاب متصدی...</option>
+                                </select>
+                                <span asp-validation-for="KhademId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label-custom">تاریخ شیفت</label>
+                                <input type="text" id="reportDate" name="ReportDate" class="form-control form-control-custom" placeholder="1403/01/01" autocomplete="off" />
+                                <span asp-validation-for="ReportDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Shift" class="form-label-custom">نوبت شیفت</label>
+                                <input type="hidden" asp-for="Shift" id="shiftInput" value="صبح" />
+                                <div class="d-flex gap-2 mt-1">
+                                    <button type="button" class="btn shift-chip active flex-fill" onclick="setShift('صبح', this)">صبح</button>
+                                    <button type="button" class="btn shift-chip flex-fill" onclick="setShift('عصر', this)">عصر</button>
+                                    <button type="button" class="btn shift-chip flex-fill" onclick="setShift('شب', this)">شب</button>
+                                </div>
+                                <span asp-validation-for="Shift" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <label asp-for="Subject" class="form-label-custom">موضوع یا محور اصلی شیفت</label>
+                                <input asp-for="Subject" class="form-control form-control-custom" placeholder="مثال: مناسبت ولادت / محوریت اخلاق و مهربانی" />
+                                <span asp-validation-for="Subject" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- بخش دوم: آمار کودکان پذیرش شده -->
+                    <div class="form-section-card" style="background-color: #faf5ff; border-color: #f3e8ff;">
+                        <div class="section-title">
+                            <span>📊</span> آمار کودکان پذیرش شده
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="RegularCount" class="form-label-custom">تعداد مجاور (بومی)</label>
+                                <input asp-for="RegularCount" id="regularCount" type="number" min="0" class="form-control form-control-custom text-center fw-bold" placeholder="0" />
+                                <span asp-validation-for="RegularCount" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="TravelerCount" class="form-label-custom">تعداد مسافر (زائر)</label>
+                                <input asp-for="TravelerCount" id="travelerCount" type="number" min="0" class="form-control form-control-custom text-center fw-bold" placeholder="0" />
+                                <span asp-validation-for="TravelerCount" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="TotalParticipants" class="form-label-custom">تعداد کل مخاطبین</label>
+                                <input asp-for="TotalParticipants" id="totalParticipants" type="number" readonly class="form-control form-control-custom bg-white text-center fw-bold text-primary" placeholder="0" />
+                                <span asp-validation-for="TotalParticipants" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- بخش سوم: فعالیت‌های فرهنگی و برنامه‌های اجرایی -->
+                    <div class="form-section-card">
+                        <div class="section-title">
+                            <span>🎨</span> برنامه‌ها و فعالیت‌های برگزار شده
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="QuranActivity" class="form-label-custom">برنامه قرآن</label>
+                                <input asp-for="QuranActivity" class="form-control form-control-custom" placeholder="مثال: حفظ سوره‌های کوچک، روانخوانی..." />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="AhkamActivity" class="form-label-custom">حلقه معرفی و احکام</label>
+                                <input asp-for="AhkamActivity" class="form-control form-control-custom" placeholder="مثال: آموزش وضو، سلام به امام رضا (ع)..." />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="GameActivity" class="form-label-custom">بازی‌های گروهی و فردی</label>
+                                <input asp-for="GameActivity" class="form-control form-control-custom" placeholder="مثال: مسابقه استافند، بازی‌های حرکتی..." />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PoemActivity" class="form-label-custom">شعر خوانی</label>
+                                <input asp-for="PoemActivity" class="form-control form-control-custom" placeholder="عنوان یا موضوع اشعار خوانده شده..." />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="StoryActivity" class="form-label-custom">داستان یا نمایشنامه</label>
+                                <input asp-for="StoryActivity" class="form-control form-control-custom" placeholder="عنوان داستان یا موضوع نمایش خلاق..." />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CraftActivity" class="form-label-custom">نقاشی و کاردستی</label>
+                                <input asp-for="CraftActivity" class="form-control form-control-custom" placeholder="موضوع نقاشی یا نوع کاردستی ساخته شده..." />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- بخش چهارم: خادمین حاضر و توضیحات تکمیلی -->
+                    <div class="form-section-card">
+                        <div class="section-title">
+                            <span>👥</span> اسامی خادمین حاضر و ملاحظات
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="PresentKhads" class="form-label-custom">کل خادمین حاضر در شیفت</label>
+                                <input asp-for="PresentKhads" class="form-control form-control-custom" placeholder="اسامی خادمین حاضر در شیفت را با کاما جدا کنید..." />
+                                <span asp-validation-for="PresentKhads" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Description" class="form-label-custom">توضیحات و گزارش تکمیلی</label>
+                                <textarea asp-for="Description" class="form-control form-control-custom" rows="3" placeholder="ملاحظات، پیشنهادات، اتفاقات خاص یا جمع‌بندی شیفت..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- دکمه ثبت نهایی -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-submit-green-pastel">
+                            💾 ثبت نهایی گزارش شیفت
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // فعال‌سازی تقویم فارسی
+            $("#reportDate").persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true
+            });
+
+            // محاسبه خودکار مجموع مخاطبین
+            function calculateTotal() {
+                var regular = parseInt($('#regularCount').val()) || 0;
+                var traveler = parseInt($('#travelerCount').val()) || 0;
+                var total = regular + traveler;
+                $('#totalParticipants').val(total);
+            }
+
+            $('#regularCount, #travelerCount').on('input change', function () {
+                calculateTotal();
+            });
+
+            calculateTotal();
+        });
+
+        // تابع انتخاب شیفت
+        function setShift(shiftName, btn) {
+            $('#shiftInput').val(shiftName);
+            $('.shift-chip').removeClass('active');
+            $(btn).addClass('active');
+        }
+    </script>
+}

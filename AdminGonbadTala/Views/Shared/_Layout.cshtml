@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AdminGonbadTala</title>
+    @* <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/persian-datepicker.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+    
+</head>
+<body dir="rtl">
+
+<header class="site-header">
+    <div class="header-inner">
+        <div class="logo-area">
+            <div class="logo-mark">🏠</div>
+            <div class="logo-text">
+                <span class="logo-title">زیر گنبد طلا</span>
+                <span class="logo-subtitle">سرزمین بازی و شادی کودکان</span>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+                <a asp-controller="kids" asp-action="Index" asp-route-id="1" class="nav-link nav-primary"><i class="bi bi-person-plus-fill"></i> ثبتنام کودک</a>
+                <a asp-controller="TimeSheets" asp-action="Index" class="nav-link nav-primary">  <i class="bi bi-clock-history"></i> لیست جاری </a>
+                <a asp-controller="khadems" asp-action="Index" class="nav-link nav-primary">  <i class="bi bi-person-badge"></i> خادمان </a>
+            
+        </nav>
+    </div>
+</header>
+
+<div class="container" >
+    
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+   
+</div>
+   
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-block">
+            <h2>ساعت کاری</h2>
+            <p>همه روزه ۱۰ صبح تا اذان مغرب </p>
+        </div>
+        <div class="footer-block">
+            <h2>آدرس</h2>
+            <p>حرم مطهر ,شبستان نرجس خاتون</p>
+        </div>
+        <div class="footer-block footer-contact">
+            <h2>ارتباط با ما</h2>
+            @* <a href="tel:02112345678">.25-37175</a>
+            <a href="https://wa.me/989121234567" target="_blank" rel="noopener"> *@
+            025-37175 
+            @*  </a> *@
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© ۱۴۰۳ زیر گنبد طلا</span>
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/persian-date.min.js"></script>
+<script src="~/js/persian-datepicker.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+   
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

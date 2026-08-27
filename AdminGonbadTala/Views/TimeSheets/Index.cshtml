@@ -1,0 +1,274 @@
+﻿@model IEnumerable<DataAccess.Models.TimeSheet>
+
+@{
+    ViewData["Title"] = "Index";
+    int rowNumber = 1;
+}
+
+@* <h1>Index</h1> *@
+<!-- دکمه اصلی پذیرش -->
+<div class="mb-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickEntryModal">
+        <i class="bi bi-plus-lg"></i> پذیرش و ورود جدید
+    </button>
+</div>
+<!-- ساختار مودال -->
+<div class="modal fade" id="quickEntryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">پذیرش سریع کودک</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBodyContent">
+                <!-- محتوای فرم Kids/Create اینجا لود می‌شود -->
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+    <a asp-action="Create">ثبت جدید</a>
+</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>
+        لیست حضور و غیاب -
+        <span class="badge @(ViewBag.CurrentShift == "morning" ? "bg-info" : "bg-warning text-dark")">
+            @(ViewBag.CurrentShift == "morning" ? "شیفت صبح" : "شیفت عصر")
+        </span>
+    </h4>
+
+    <div>
+        @if (ViewBag.CurrentShift == "evening")
+        {
+            <a asp-action="Index" asp-route-shift="morning" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-sun"></i> مشاهده لیست صبح امروز
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" asp-route-shift="evening" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-moon"></i> مشاهده لیست عصر امروز
+            </a>
+        }
+        <!-- دکمه ثبت گزارش نهایی -->
+        <a asp-controller="ShiftReports" asp-action="Create"
+           asp-route-total="@ViewBag.TotalCount"
+           asp-route-traveler="@ViewBag.TravelerCount"
+           asp-route-regular="@ViewBag.RegularCount"
+           class="btn btn-success btn-sm">
+            <i class="fa fa-file-text"></i> ثبت گزارش نهایی
+        </a>
+    </div>
+</div>
+
+
+
+<form asp-action="Index" method="get" class="mb-3">
+    <!-- حفظ شیفت فعلی موقع جستجو -->
+    <input type="hidden" name="shift" value="@ViewBag.CurrentShift" />
+
+    <div class="input-group">
+        <input type="text"
+               name="searchString"
+               value="@ViewData["CurrentFilter"]"
+               class="form-control"
+               placeholder="جستجو بر اساس نام، نام خانوادگی یا شماره تماس..." />
+
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> جستجو
+            </button>
+
+            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+            {
+                <a asp-action="Index" asp-route-shift="@ViewBag.CurrentShift" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> پاک کردن فیلتر
+                </a>
+            }
+        </div>
+    </div>
+</form>
+
+<div class="row mb-3 mt-2">
+    <!-- باکس تعداد حاضرین در سالن - با رنگ متمایز -->
+    <div class="col-6 col-md-3 mb-2">
+        <div class="card card-pastel-danger  text-center shadow-sm">
+            <div class="card-body p-2">
+                <h6 class="card-title mb-1">حاضر در سالن</h6>
+                <h4 class="mb-0">@ViewBag.PresentCount</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- باکس کل ورودی‌های این شیفت -->
+    <div class="col-6 col-md-3 mb-2">
+        <div class="card card-pastel-primary  text-center shadow-sm">
+            <div class="card-body p-2">
+                <h6 class="card-title mb-1">کل ورودی شیفت</h6>
+                <h4 class="mb-0">@ViewBag.TotalCount</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- باکس مسافرین -->
+    <div class="col-6 col-md-3 mb-2">
+        <div class="card card-pastel-warning  text-center shadow-sm">
+            <div class="card-body p-2">
+                <h6 class="card-title mb-1"> مسافر</h6>
+                <h4 class="mb-0">@ViewBag.TravelerCount</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- باکس بومی‌ها -->
+    <div class="col-6 col-md-3 mb-2">
+        <div class="card card-pastel-success text-center shadow-sm">
+            <div class="card-body p-2">
+                <h6 class="card-title mb-1"> بومی</h6>
+                <h4 class="mb-0">@ViewBag.RegularCount</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="table-wrapper">
+<table class="table custom-gray-table">
+    @*  <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EntryTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExitTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Childd)
+            </th>
+            <th></th>
+        </tr>
+    </thead> *@
+    <thead>
+    <tr>
+        <th>ردیف</th>
+        <th>نام</th>
+        <th> ورود</th>
+        <th> خروج</th>
+        <th>مدت حضور</th>
+        <th>شماره تماس</th> <!-- ستون جدید -->
+        <th>همراهی؟</th> <!-- ستون جدید -->
+        <th>عملیات</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+                // محاسبه مدت زمان حضور
+                TimeSpan duration = item.ExitTime.HasValue
+                ? (item.ExitTime.Value - item.EntryTime)
+                : (DateTime.Now - item.EntryTime);
+
+                // تبدیل به متن خوانا (مثلاً: 1 ساعت و 15 دقیقه یا 45 دقیقه)
+                string durationText = "";
+                if (duration.TotalHours >= 1)
+                {
+                    durationText = $"{(int)duration.TotalHours} ساعت و {duration.Minutes} دقیقه";
+                }
+                else
+                {
+                    durationText = $"{duration.Minutes} دقیقه";
+                }
+
+                // شرط اتمام زمان (بیشتر از 60 دقیقه حضور داشته و هنوز خارج نشده باشد)
+                bool isOvertime = !item.ExitTime.HasValue && duration.TotalMinutes > 33;
+                <tr class="@(isOvertime ? "overtime-row" : "")">
+            @* <td>
+                @Html.DisplayFor(modelItem => item.EntryTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExitTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Childd.FirstName)
+            </td> *@
+            <td>@(rowNumber++)</td>
+                <td>@item.Childd.FirstName @item.Childd.LastName</td>
+                <td>@item.EntryTime.ToShortTimeString()</td>
+                <td>@(item.ExitTime?.ToShortTimeString() ?? "مشغول بازی")</td>
+                    <td>
+                        <!-- نمایش مدت زمان حضور به همراه یک آیکون کوچک در صورت اتمام زمان -->
+                        @durationText
+                        @if (isOvertime)
+                        {
+                            <span class="badge bg-danger ms-1 text-white animate-pulse">پایان وقت</span>
+                        }
+                    </td>
+                <td>@item.Childd.PhoneNumber</td> <!-- نمایش شماره تماس از جدول Kid -->
+                <td>@item.Guardian</td>    <!-- نمایش تحویل‌گیرنده از جدول Kid -->
+                <td>
+                        @if (item.ExitTime == null)
+                        {
+                            <!-- فرم کوچک برای ارسال درخواست POST -->
+                            <form asp-action="CheckOut" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm shadow-sm"
+                                        onclick="return confirm('آیا از ثبت خروج اطمینان دارید؟')">
+                                    ثبت خروج
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">خارج شده</span>
+                        }
+                </td>
+            
+            <td>
+                @* <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> | *@
+                @* <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+                <form asp-action="Delete" asp-route-id="@item.Id" method="post" >
+                    <button class="btn btn-link text-danger border-0" style="outline:non;" type="submit"  onclick="return confirm('آیا از حذف این مورد اطمینان دارید؟')" class="text-danger" title="حذف">
+                    <i class="bi bi-trash3-fill" style="font-size: 1.15rem;"></i>
+              </button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>
+@section Scripts {
+    <script>
+        // رفرش خودکار صفحه هر 1 دقیقه برای به‌روزرسانی زمان‌ها
+        setInterval(function () {
+            location.reload();
+        }, 60000); // 60000 میلی‌ثانیه = 1 دقیقه
+    </script>
+    <script>
+        $(document).ready(function () {
+            console.log("جاوااسکریپت تایم‌شیت لود شد.");
+
+            var quickEntryModal = document.getElementById('quickEntryModal');
+
+            if (quickEntryModal) {
+                quickEntryModal.addEventListener('show.bs.modal', function () {
+                    console.log("مودال در حال باز شدن است. درخواست لود فرستاده می‌شود...");
+                    
+                    $('#modalBodyContent').load('/Kids/CreatePartial', function(response, status, xhr) {
+                        console.log("وضعیت درخواست لود: " + status);
+                        if (status == "error") {
+                            console.log("جزئیات خطا: " + xhr.status + " " + xhr.statusText);
+                        }
+                    });
+                });
+            } else {
+                console.log("خطا: المان با آیدی quickEntryModal پیدا نشد!");
+            }
+        });
+    </script>
+}

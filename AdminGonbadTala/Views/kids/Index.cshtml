@@ -1,0 +1,143 @@
+﻿@model IEnumerable<DataAccess.Models.kid>
+
+@{
+    ViewData["Title"] = "Index";
+    int rowNumber = 1;
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="card p-3 mb-4 shadow-sm">
+    <form asp-action="Index" method="get" class="row g-3">
+        <div class="col-md-8">
+            <input type="text" name="searchString" class="form-control"
+                   placeholder="جستجو بر اساس نام، نام خانوادگی یا شماره تماس..."
+                   value="@ViewData["CurrentFilter"]" />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">جستجو</button>
+        </div>
+    </form>
+</div>
+
+<table class="table custom-gray-table">
+    <thead>
+    <tr>
+            <th>ردیف</th>
+        <th>
+            نام
+        </th>
+        <th>
+            نام خانوادگی
+        </th>
+        <th>
+            شماره تماس
+        </th>
+        <th>
+            مسافر؟
+        </th>
+        <th>
+            سن
+        </th>
+
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr>
+                <td>@(rowNumber++)</td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LastName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PhoneNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsTraveler)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Age)
+        </td>
+
+        <td>
+            @* <form asp-action="NewEntry" asp-route-id="@item.Id" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-success rounded-pill shadow-sm px-3">
+                    <i class="bi bi-box-arrow-in-right"></i> ثبت ورود
+                </button>
+            </form> *@
+            <button onclick="registerEntry(@item.Id, '@item.FirstName @item.LastName')" class="btn btn-primary btn-sm">
+                ثبت ورود
+            </button>
+            @* <a asp-controller="Kids" asp-action="NewEntry" asp-route-id="@item.Id" class="btn btn-success btn-sm"></a> *@
+
+        </td>
+        <td>
+            @*   <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+            <form asp-action="Delete" asp-route-id="@item.Id" method="post" >
+            <button class="btn btn-link text-danger border-0" style="outline:non;" type="submit"  onclick="return confirm('آیا از حذف این مورد اطمینان دارید؟')" class="text-danger" title="حذف">
+                <i class="bi bi-trash3-fill" style="font-size: 1.15rem;"></i>
+            </button>
+            </form>
+        </td>
+    </tr>
+}
+    </tbody>
+</table>
+<div class="modal fade" id="companionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">انتخاب همراه کودک</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p id="kidNameDisplay" class="font-weight-bold"></p>
+                <div class="d-flex flex-wrap justify-content-center">
+                    <button class="btn btn-outline-info m-1 btn-comp" data-val="مادر">مادر</button>
+                    <button class="btn btn-outline-info m-1 btn-comp" data-val="پدر">پدر</button>
+                    <button class="btn btn-outline-info m-1 btn-comp" data-val="مادربزرگ">مادربزرگ</button>
+                    <button class="btn btn-outline-info m-1 btn-comp" data-val="پدربزرگ">پدربزرگ</button>
+                    <input type="text" id="otherCompanion" class="form-control mt-2" placeholder="سایر..." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="submitEntry" class="btn btn-success w-100">تایید و ثبت نهایی</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedKidId = 0;
+        let selectedCompanion = "مادر"; // پیش‌فرض
+
+        function registerEntry(id, name) {
+            selectedKidId = id;
+            $('#kidNameDisplay').text(name);
+            $('#companionModal').modal('show');
+        }
+
+        $('.btn-comp').click(function() {
+            $('.btn-comp').removeClass('btn-info').addClass('btn-outline-info');
+            $(this).removeClass('btn-outline-info').addClass('btn-info');
+            selectedCompanion = $(this).data('val');
+        });
+
+        $('#submitEntry').click(function() {
+            let other = $('#otherCompanion').val();
+            let finalCompanion = other ? other : selectedCompanion;
+
+            window.location.href = `/kids/NewEntry?kidId=${selectedKidId}&companion=${finalCompanion}`;
+        });
+    </script>
+}

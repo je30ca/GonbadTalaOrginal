@@ -1,0 +1,66 @@
+﻿@model DataAccess.Models.TimeShitChild
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>TimeShitChild</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CardNumber" class="control-label"></label>
+                <input asp-for="CardNumber" class="form-control" />
+                <span asp-validation-for="CardNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IsMosafer" class="control-label"></label>
+                <input asp-for="IsMosafer" class="form-control" />
+                <span asp-validation-for="IsMosafer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PickUpBy" class="control-label"></label>
+                <input asp-for="PickUpBy" class="form-control" />
+                <span asp-validation-for="PickUpBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateNow" class="control-label"></label>
+                <input asp-for="DateNow" class="form-control" />
+                <span asp-validation-for="DateNow" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeIn" class="control-label"></label>
+                <input asp-for="TimeIn" class="form-control" />
+                <span asp-validation-for="TimeIn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeOut" class="control-label"></label>
+                <input asp-for="TimeOut" class="form-control" />
+                <span asp-validation-for="TimeOut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="InfoKhademId" class="control-label"></label>
+                <select asp-for="InfoKhademId" class ="form-control" asp-items="ViewBag.InfoKhademId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="InfochildId" class="control-label"></label>
+                <select asp-for="InfochildId" class ="form-control" asp-items="ViewBag.InfochildId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

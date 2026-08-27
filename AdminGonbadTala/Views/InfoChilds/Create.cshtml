@@ -1,0 +1,133 @@
+﻿@model DataAccess.Models.InfoChild
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+@* <h1>ثبت نام کودک</h1> *@
+
+@* <h4>InfoChild</h4> *@
+<hr />
+<div class="container mt-5">
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+<div class="row align-items-center">
+   
+    <div class="col-md-4">
+        <form asp-action="Create">
+                    <h1>ثبت نام کودک</h1>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label for="PhoneNumber">شماره تماس</label>
+                <input asp-for="PhoneNumber" class="form-control"/>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FName" class="control-label">نام</label>
+                <input asp-for="FName" class="form-control"/>
+                <span asp-validation-for="FName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LName" class="control-label">نام خانوادگی</label>
+                <input asp-for="LName" class="form-control"/>
+                <span asp-validation-for="LName" class="text-danger"></span>
+            </div>
+           
+                @* <label asp-for="BirthDate" class="control-label"></label>
+                <input asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span> *@
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="gender" id="male" value="male" autocomplete="off" checked>
+                        <label class="btn btn-sm btn-outline-primary" for="male">اهل قم</label>
+
+                <input type="radio" class="btn-check" name="gender" id="female" value="female" autocomplete="off">
+                        <label class="btn btn-sm btn-outline-primary" for="female">مسافر</label>
+            </div>
+
+                <div class="form-group">
+                    <label  class="control-label">تاریخ تولد</label>
+                    <input type="text"
+                           id="BirthDate"
+                           name="BirthDateStr"
+                           class="form-control"
+                           autocomplete="off"/>
+                    <span  class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FName" class="control-label">شماره کارت</label>
+                    <input asp-for="FName" class="form-control"/>
+                    <span asp-validation-for="FName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>تحویل با:</label>
+                    <input type="text" id="interest" name="Interest" class="form-control">
+    
+                    <div class="mt-2 d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                onclick="setInterest(this)">پدر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                onclick="setInterest(this)">مادر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                onclick="setInterest(this)">خواهر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                onclick="setInterest(this)">برادر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                onclick="setInterest(this)">سایر</button>
+                    </div>
+                </div>
+
+                <script>
+    function setInterest(btn) {
+        document.getElementById('interest').value = btn.textContent;
+    }
+</script>
+            <div class="form-group">
+                        <label class="control-label">تاریخ ثبت</label>
+                <input type="text"
+                       id="RegisterDate"
+                       name="RegisterDateStr"
+                       class="form-control"
+                       autocomplete="off"/>
+                <span id="span1"></span>
+                @* <label asp-for="RegisterDate" class="control-label"></label>
+                <input asp-for="RegisterDate" class="form-control" />
+                <span asp-validation-for="RegisterDate" class="text-danger"></span> *@
+            </div>
+            <div class="form-group d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn btn-gold-orange btn-lg px-5 rounded-pill shadow-sm">ثبت اطلاعات</button>
+                <a asp-action="Index" class="btn btn-list-view btn-lg px-4 rounded-pill">مشاهده لیست</a>
+            </div>
+
+
+        </form>
+    </div>
+    <div class="col-md-4 d-none d-md-block">
+        <img src="~/images/child.png" class="img-fluid" alt="توضیح تصویر">
+    </div>
+</div>
+    </div>
+</div>
+<div>
+    @* <input asp-action="Index" value="ثبت" class="btn btn-primary"/>
+    <a asp-action="Index">مشاهده لیست خردسال</a> *@
+@* <div class="d-flex justify-content-center mt-3">
+        <a asp-action="Index" class="btn btn-list-view btn-lg px-4 rounded-pill">مشاهده لیست</a>
+    </div> *@1
+</div>
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+            $("#BirthDate").persianDatepicker({
+            format: 'YYYY/MM/DD'
+        });
+    });
+           $(document).ready(function () {
+                    $("#RegisterDate").persianDatepicker({
+                format: 'YYYY/MM/DD'
+            });
+        });
+</script>
+
+   
+    
+}

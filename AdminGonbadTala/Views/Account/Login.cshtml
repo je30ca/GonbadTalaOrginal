@@ -1,0 +1,93 @@
+﻿@{
+    Layout = null; // برای اینکه منوی بالای سایت در صفحه لاگین نیاید
+}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ورود به سیستم - زیر گنبد طلا</title>
+
+    <!-- اضافه کردن بوت‌استرپ چون Layout نال شده است -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .btn-pastel {
+            background-color: #a2d2ff;
+            color: #fff;
+            border: none;
+            transition: all 0.3s;
+        }
+
+            .btn-pastel:hover {
+                background-color: #bde0fe;
+                transform: translateY(-2px);
+            }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card login-card p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-secondary">زیر گنبد طلا</h2>
+                        <p class="text-muted small">ورود به پنل مدیریت خادمین</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger py-2 small text-center mb-3">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">شماره همراه</label>
+                            <input name="phoneNumber" type="text" class="form-control" placeholder="09xxxxxxxxx" required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">رمز عبور</label>
+                            <input name="password" type="password" class="form-control" placeholder="******" required />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-pastel py-2 fw-bold shadow-sm">
+                                ورود به سیستم
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

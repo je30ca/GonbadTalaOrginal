@@ -1,0 +1,430 @@
+﻿@* @model DataAccess.Models.kid
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>kid</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label">شماره تماس</label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <button type="button" id="btnCheck" class="btn btn-info">بررسی</button>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label">نام</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label">نام خانوادگی</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <input type="hidden" id="KidId" name="KidId" value="0" />
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsTraveler" /> مسافر
+                </label>
+            </div>
+          
+            <div class="form-group">
+                <label  class="control-label">تاریخ تولد</label>
+                <input type="text"
+                       id="birthDate"
+                       name="BirthDate"
+                       class="form-control"
+                       autocomplete="off"/>
+                <span  class="text-danger"></span>
+            </div>
+            <label>سن</label>
+            <input type="text" id="ageDisplay" class="form-control" readonly />
+           
+            <div class="form-group">
+                <label asp-for="Guardian" class="control-label">همراهی؟</label>
+                <input asp-for="Guardian" class="form-control" />
+                <span asp-validation-for="Guardian" class="text-danger"></span>
+            </div>
+            <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('ندارد')">ندارد</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('مادر')">مادر</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('پدر')">پدر</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('مادربزرگ')">مادربزرگ</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('پدربزرگ')">پدربزرگ</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('خاله/عمه')">خاله/عمه</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('عمو/دایی')">عمو/دایی</button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="setVal('سایر')">سایر</button>
+            </div>
+
+          
+            <div class="form-group">
+                <input type="submit" id="btnSubmit" value="Create" class="btn btn-primary" />
+               
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    $(document).ready(function () {
+             $("#birthDate").persianDatepicker({
+            format: 'YYYY/MM/DD',
+            autoClose: true,
+            onSelect: function(unix) {
+                // تبدیل زمان انتخاب شده به تاریخ میلادی برای محاسبه سن
+                var birthDate = new Date(unix);
+                var today = new Date();
+
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = today.getMonth() - birthDate.getMonth();
+
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                // قرار دادن سن در باکس
+                $('#ageDisplay').val(age);
+            }
+        });
+    });
+ 
+$('#btnCheck').click(function() {
+            var phone = $('#PhoneNumber').val();
+
+    $.get('/Kids/GetKidByPhone?phone=' + phone, function(data) {
+        if (data.success) {
+                    $('#KidId').val(data.id);
+            // اگر پیدا شد، فیلدها را پر کن
+                    $('#FirstName').val(data.firstName);
+                    $('#LastName').val(data.lastName);
+                    $('#IsTraveler').prop('checked', data.istraveler);
+                    $('#Guardian').val(data.guardian);
+                   $('#birthDate').val(data.birthDate);
+                   $('#ageDisplay').val(data.ageDisplay);
+         // ۳. تغییر ظاهر دکمه به "ثبت ورود"
+                    $('#btnSubmit')
+                        .val('ثبت ورود کودک')
+                        .removeClass('btn-primary')
+                        .addClass('btn-success');
+                }
+                else {
+            // اگر پیدا نشد، اجازه بده خادم پر کند
+
+                    $('#KidId').val('0');
+                $('#FirstName').val('').focus();
+                $('#LastName').val('');
+                $('#Guardian').val('');
+                $('#birthDate').val('');
+                $('#ageDisplay').val('');
+                $('#IsTraveler').prop('checked', false);
+                         $('#btnSubmit')
+                                .val('ثبت کودک')
+                                .removeClass('btn-primary')
+                                .addClass('btn-success');
+        }
+    });
+});
+
+
+        function setVal(value) {
+            // مقدار فیلد ورودی با آی‌دی Guardian را برابر با مقدار کلیک شده قرار می‌دهد
+            $('#Guardian').val(value);
+        }
+             
+    </script>
+}
+    
+ *@
+@model DataAccess.Models.kid
+
+@{
+    ViewData["Title"] = "ثبت‌نام و ورود کودک";
+}
+
+<style>
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-header {
+        border-bottom: 1px solid #f8fafc;
+        padding: 1.25rem 1.75rem;
+    }
+
+    .form-label-custom {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.375rem;
+    }
+
+    .form-control-custom {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.95rem;
+        color: #1e293b;
+        background-color: #fafafa;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .form-control-custom:focus {
+            border-color: #c084fc;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.15);
+            outline: none;
+        }
+
+    .search-group {
+        background-color: #faf5ff;
+        border: 1px solid #f3e8ff;
+        border-radius: 14px;
+        padding: 1rem;
+    }
+
+    /* دکمه استعلام - بنفش پاستیلی */
+    .btn-search-pastel {
+        background-color: #ddd6fe;
+        color: #5b21b6;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.5rem 1.25rem;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-search-pastel:hover {
+            background-color: #c4b5fd;
+            color: #4c1d95;
+        }
+
+    /* چیپ‌های همراهی - پاستیلی خنثی */
+    .chip-btn-pastel {
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        color: #475569;
+        border-radius: 10px;
+        padding: 0.45rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+        .chip-btn-pastel:hover {
+            background-color: #e0f2fe;
+            border-color: #bae6fd;
+            color: #0369a1;
+        }
+
+    /* دکمه ثبت اصلی - سبز پاستیلی */
+    .btn-submit-green-pastel {
+        background-color: #a7f3d0;
+        color: #064e3b;
+        border-radius: 12px;
+        padding: 0.8rem;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-submit-green-pastel:hover {
+            background-color: #6ee7b7;
+            color: #022c22;
+        }
+
+    /* دکمه ثبت ورود موجود - آبی پاستیلی */
+    .btn-submit-blue-pastel {
+        background-color: #bfdbfe !important;
+        color: #1e3a8a !important;
+    }
+
+        .btn-submit-blue-pastel:hover {
+            background-color: #93c5fd !important;
+            color: #172554 !important;
+        }
+
+    .switch-container {
+        background-color: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+    }
+</style>
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="form-card">
+
+            <!-- هدر فرم -->
+            <div class="form-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1">ثبت پذیرش کودک</h5>
+                    <p class="text-muted small mb-0">اطلاعات کودک را جهت ثبت ورود وارد نمایید</p>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-3 px-3">
+                    لیست کودکان
+                </a>
+            </div>
+
+            <div class="p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" id="KidId" name="KidId" value="0" />
+
+                    <!-- بخش استعلام بر اساس شماره تماس -->
+                    <div class="search-group mb-4">
+                        <label asp-for="PhoneNumber" class="form-label-custom">شماره تماس سرپرست</label>
+                        <div class="input-group">
+                            <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="مثال: 09123456789" autocomplete="off" />
+                            <button type="button" id="btnCheck" class="btn btn-search-pastel me-2">
+                                استعلام
+                            </button>
+                        </div>
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <!-- نام و نام خانوادگی -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label-custom">نام</label>
+                            <input asp-for="FirstName" class="form-control form-control-custom" placeholder="نام کودک" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LastName" class="form-label-custom">نام خانوادگی</label>
+                            <input asp-for="LastName" class="form-control form-control-custom" placeholder="نام خانوادگی" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- تاریخ تولد و سن -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-7">
+                            <label class="form-label-custom">تاریخ تولد</label>
+                            <input type="text" id="birthDate" name="BirthDate" class="form-control form-control-custom" placeholder="1398/01/01" autocomplete="off" />
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label-custom">سن</label>
+                            <input type="text" id="ageDisplay" class="form-control form-control-custom bg-light" readonly placeholder="محاسبه خودکار" />
+                        </div>
+                    </div>
+
+                    <!-- نوع پذیرش (زائر/بومی) -->
+                    <div class="switch-container mb-4 d-flex align-items-center justify-content-between">
+                        <span class="form-label-custom m-0">پذیرش به عنوان زائر / مسافر</span>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input" type="checkbox" asp-for="IsTraveler" id="IsTraveler" style="cursor: pointer; width: 2.5em; height: 1.25em;">
+                        </div>
+                    </div>
+
+                    <!-- همراه کودک -->
+                    <div class="mb-4">
+                        <label asp-for="Guardian" class="form-label-custom">نسبت همراه</label>
+                        <input asp-for="Guardian" class="form-control form-control-custom mb-2" placeholder="همراه را انتخاب کنید یا بنویسید..." />
+                        <span asp-validation-for="Guardian" class="text-danger small"></span>
+
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('مادر')">مادر</button>
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('پدر')">پدر</button>
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('مادربزرگ')">مادربزرگ</button>
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('پدربزرگ')">پدربزرگ</button>
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('خاله/عمه')">خاله/عمه</button>
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('عمو/دایی')">عمو/دایی</button>
+                            <button type="button" class="btn chip-btn-pastel" onclick="setVal('بدون همراه')">بدون همراه</button>
+                        </div>
+                    </div>
+
+                    <!-- ثبت نهایی -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" id="btnSubmit" class="btn btn-submit-green-pastel">
+                            ثبت‌نام و ورود کودک جدید
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $("#birthDate").persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                onSelect: function(unix) {
+                    var birthDate = new Date(unix);
+                    var today = new Date();
+                    var age = today.getFullYear() - birthDate.getFullYear();
+                    var m = today.getMonth() - birthDate.getMonth();
+
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    $('#ageDisplay').val(age + " سال");
+                }
+            });
+        });
+
+        $('#btnCheck').click(function() {
+            var phone = $('#PhoneNumber').val();
+            if (!phone) {
+                alert('لطفاً شماره تماس را وارد کنید.');
+                return;
+            }
+
+            $.get('/Kids/GetKidByPhone?phone=' + phone, function(data) {
+                if (data.success) {
+                    $('#KidId').val(data.id);
+                    $('#FirstName').val(data.firstName);
+                    $('#LastName').val(data.lastName);
+                    $('#IsTraveler').prop('checked', data.istraveler);
+                    $('#Guardian').val(data.guardian);
+                    $('#birthDate').val(data.birthDate);
+                    $('#ageDisplay').val(data.ageDisplay ? data.ageDisplay + " سال" : "");
+
+                    $('#btnSubmit')
+                        .text('ثبت ورود کودک (موجود در سیستم)')
+                        .addClass('btn-submit-blue-pastel');
+                } else {
+                    $('#KidId').val('0');
+                    $('#FirstName').val('').focus();
+                    $('#LastName').val('');
+                    $('#Guardian').val('');
+                    $('#birthDate').val('');
+                    $('#ageDisplay').val('');
+                    $('#IsTraveler').prop('checked', false);
+
+                    $('#btnSubmit')
+                        .text('ثبت‌نام و ورود کودک جدید')
+                        .removeClass('btn-submit-blue-pastel');
+                }
+            });
+        });
+
+        function setVal(value) {
+            $('#Guardian').val(value);
+        }
+    </script>
+}

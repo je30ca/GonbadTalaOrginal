@@ -1,0 +1,95 @@
+﻿@model IEnumerable<DataAccess.Models.TimeShitChild>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="table-wrapper">
+    <table class="table custom-orange-table">
+        <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CardNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsMosafer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PickUpBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateNow)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeIn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeOut)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InfoKhadem)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InfoChild)
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CardNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsMosafer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PickUpBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateNow)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeIn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeOut)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InfoKhadem.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InfoChild.Id)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // شناسایی مودال با استفاده از آیدی آن
+            var quickEntryModal = document.getElementById('quickEntryModal');
+
+            // هر زمان که مودال باز شد، این کد اجرا می‌شود
+            quickEntryModal.addEventListener('show.bs.modal', function () {
+
+                // فرم پارشال از سرور خوانده شده و داخل بدنه مودال ریخته می‌شود
+                $('#modalBodyContent').load('/Kids/CreatePartial');
+
+            });
+        });
+    </script>
+}
