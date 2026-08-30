@@ -1,6 +1,10 @@
 ﻿using DataAccess.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace AdminGonbadTala.Controllers
 {
@@ -14,6 +18,7 @@ namespace AdminGonbadTala.Controllers
         }
 
         // صفحه ورود (GET)
+        [AllowAnonymous]
         public IActionResult Login()
         {
             // اگر قبلاً لاگین کرده، بفرستش به داشبورد یا لیست کودکان
@@ -29,6 +34,7 @@ namespace AdminGonbadTala.Controllers
         // ثبت ورود (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(string phoneNumber, string password)
         {
             var khadem = await _context.Khadems
@@ -36,6 +42,15 @@ namespace AdminGonbadTala.Controllers
 
             if (khadem != null)
             {
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, khadem.Id.ToString()),
+                    new Claim(ClaimTypes.Name, khadem.FullName)
+                };
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
+
                 // ذخیره اطلاعات خادم در سشن
                 HttpContext.Session.SetInt32("KhademId", khadem.Id);
                 HttpContext.Session.SetString("KhademName", khadem.FirstName+" "+ khadem.LastName);
@@ -48,9 +63,10 @@ namespace AdminGonbadTala.Controllers
         }
 
         // خروج از حساب کاربری
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
     }

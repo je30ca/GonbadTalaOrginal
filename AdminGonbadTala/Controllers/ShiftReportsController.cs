@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Data;
@@ -11,6 +12,7 @@ using PersianDate.Standard;
 
 namespace AdminGonbadTala.Controllers
 {
+    [Authorize]
     public class ShiftReportsController : Controller
     {
         private readonly GonbadDbContext _context;

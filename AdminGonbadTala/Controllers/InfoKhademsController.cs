@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.InfoKhademService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Data;
@@ -12,6 +13,7 @@ using DataAccess.Models;
 
 namespace AdminGonbadTala.Controllers
 {
+    [Authorize]
     public class InfoKhademsController : Controller
     {
         private readonly InfoKhademService _infoKhademService;

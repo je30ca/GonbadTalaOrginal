@@ -8,6 +8,7 @@ using DataAccess.Repositories.InfoKhademRepo;
 
 using DataAccess.Repositories.TimeshitChildRepo;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 
 
@@ -23,6 +24,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// احراز هویت کوکی برای محافظت از صفحات مدیریتی
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(4);
+        options.SlidingExpiration = true;
+    });
+builder.Services.AddAuthorization();
+
 builder.Services.AddDbContext<GonbadDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IChildRepositories, ChildRepositories>();
@@ -35,6 +47,7 @@ builder.Services.AddScoped<IInfoKademRepositories, InfoKademRepositories>();
 builder.Services.AddScoped<InfoKhademService>();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(4); // خروج خودکار بعد از ۸ ساعت بیکاری
@@ -60,6 +73,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

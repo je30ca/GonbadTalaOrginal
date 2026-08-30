@@ -6,6 +6,7 @@ using Core.ChildInfoService;
 using Core.InfoKhademService;
 using Core.TimeShitChild;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Data;
@@ -13,6 +14,7 @@ using DataAccess.Models;
 
 namespace AdminGonbadTala.Controllers
 {
+    [Authorize]
     public class TimeShitChildsController : Controller
     {
         private readonly TimeShitService _timeShitService;
