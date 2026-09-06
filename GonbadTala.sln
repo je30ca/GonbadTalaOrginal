@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminGonbadTala", "AdminGonbadTala\AdminGonbadTala.csproj", "{F6D8750A-14B7-4469-A515-1E153979E530}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminGonbadTala.Tests", "AdminGonbadTala.Tests\AdminGonbadTala.Tests.csproj", "{B6524D2B-242B-4F3F-8C1A-09391D602DE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F6D8750A-14B7-4469-A515-1E153979E530}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6D8750A-14B7-4469-A515-1E153979E530}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6D8750A-14B7-4469-A515-1E153979E530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6524D2B-242B-4F3F-8C1A-09391D602DE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6524D2B-242B-4F3F-8C1A-09391D602DE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6524D2B-242B-4F3F-8C1A-09391D602DE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6524D2B-242B-4F3F-8C1A-09391D602DE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

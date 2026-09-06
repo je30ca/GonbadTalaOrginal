@@ -6,21 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+using AdminGonbadTala.Services;
 
 namespace AdminGonbadTala.Controllers
 {
     public class AccountController : Controller
     {
         private readonly GonbadDbContext _context;
-        private readonly IPasswordHasher<Khadem> _passwordHasher;
+        private readonly KhademPasswordService _passwordService;
 
-        public AccountController(GonbadDbContext context, IPasswordHasher<Khadem> passwordHasher)
+        public AccountController(GonbadDbContext context, KhademPasswordService passwordService)
         {
             _context = context;
-            _passwordHasher = passwordHasher;
+            _passwordService = passwordService;
         }
 
         // صفحه ورود (GET)
@@ -48,61 +46,28 @@ namespace AdminGonbadTala.Controllers
 
             if (khadem != null)
             {
-                PasswordVerificationResult verification;
-                try
+                if (_passwordService.VerifyAndUpgradeIfNeeded(khadem, password))
                 {
-                    verification = _passwordHasher.VerifyHashedPassword(
-                        khadem, khadem.PasswordHash, password);
-                }
-                catch (FormatException)
-                {
-                    verification = PasswordVerificationResult.Failed;
-                }
-
-                // PasswordHash contains legacy plain-text values immediately after
-                // the migration. Upgrade a matching legacy value on first login.
-                if (verification == PasswordVerificationResult.Failed &&
-                    IsLegacyPasswordMatch(khadem.PasswordHash, password))
-                {
-                    khadem.PasswordHash = _passwordHasher.HashPassword(khadem, password);
                     await _context.SaveChangesAsync();
-                    verification = PasswordVerificationResult.Success;
-                }
+                    var claims = new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, khadem.Id.ToString()),
+                        new Claim(ClaimTypes.Name, khadem.FullName)
+                    };
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
 
-                if (verification != PasswordVerificationResult.Failed)
-                {
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, khadem.Id.ToString()),
-                    new Claim(ClaimTypes.Name, khadem.FullName)
-                };
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
+                    // ذخیره اطلاعات خادم در سشن
+                    HttpContext.Session.SetInt32("KhademId", khadem.Id);
+                    HttpContext.Session.SetString("KhademName", khadem.FirstName+" "+ khadem.LastName);
 
-                // ذخیره اطلاعات خادم در سشن
-                HttpContext.Session.SetInt32("KhademId", khadem.Id);
-                HttpContext.Session.SetString("KhademName", khadem.FirstName+" "+ khadem.LastName);
-
-                return RedirectToAction("Index", "Timesheets"); // هدایت به صفحه اصلی حضوروغیاب
+                    return RedirectToAction("Index", "Timesheets"); // هدایت به صفحه اصلی حضوروغیاب
                 }
             }
 
             ViewBag.Error = "شماره همراه یا رمز عبور اشتباه است.";
             return View();
-        }
-
-        private static bool IsLegacyPasswordMatch(string storedValue, string suppliedPassword)
-        {
-            if (string.IsNullOrEmpty(storedValue))
-            {
-                return false;
-            }
-
-            var storedBytes = Encoding.UTF8.GetBytes(storedValue);
-            var suppliedBytes = Encoding.UTF8.GetBytes(suppliedPassword);
-            return storedBytes.Length == suppliedBytes.Length &&
-                   CryptographicOperations.FixedTimeEquals(storedBytes, suppliedBytes);
         }
 
         // خروج از حساب کاربری

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Data;
 using DataAccess.Models;
-using Microsoft.AspNetCore.Identity;
+using AdminGonbadTala.Services;
 
 namespace AdminGonbadTala.Controllers
 {
@@ -16,12 +16,12 @@ namespace AdminGonbadTala.Controllers
     public class KhademsController : Controller
     {
         private readonly GonbadDbContext _context;
-        private readonly IPasswordHasher<Khadem> _passwordHasher;
+        private readonly KhademPasswordService _passwordService;
 
-        public KhademsController(GonbadDbContext context, IPasswordHasher<Khadem> passwordHasher)
+        public KhademsController(GonbadDbContext context, KhademPasswordService passwordService)
         {
             _context = context;
-            _passwordHasher = passwordHasher;
+            _passwordService = passwordService;
         }
 
         // GET: Khadems
@@ -99,7 +99,7 @@ namespace AdminGonbadTala.Controllers
 
             if (ModelState.IsValid)
             {
-                khadem.PasswordHash = _passwordHasher.HashPassword(khadem, password);
+                _passwordService.SetPassword(khadem, password);
                 _context.Add(khadem);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -155,7 +155,7 @@ namespace AdminGonbadTala.Controllers
 
                     if (!string.IsNullOrWhiteSpace(password))
                     {
-                        existingKhadem.PasswordHash = _passwordHasher.HashPassword(existingKhadem, password);
+                        _passwordService.SetPassword(existingKhadem, password);
                     }
 
                     await _context.SaveChangesAsync();

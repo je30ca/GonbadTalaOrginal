@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using DataAccess.Models;
+using AdminGonbadTala.Services;
 using System.Globalization;
 
 
@@ -37,6 +38,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPasswordHasher<Khadem>, PasswordHasher<Khadem>>();
+builder.Services.AddScoped<KhademPasswordService>();
 
 builder.Services.AddDbContext<GonbadDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
