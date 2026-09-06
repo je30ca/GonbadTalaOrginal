@@ -48,7 +48,16 @@ namespace AdminGonbadTala.Controllers
 
             if (khadem != null)
             {
-                var verification = _passwordHasher.VerifyHashedPassword(khadem, khadem.PasswordHash, password);
+                PasswordVerificationResult verification;
+                try
+                {
+                    verification = _passwordHasher.VerifyHashedPassword(
+                        khadem, khadem.PasswordHash, password);
+                }
+                catch (FormatException)
+                {
+                    verification = PasswordVerificationResult.Failed;
+                }
 
                 // PasswordHash contains legacy plain-text values immediately after
                 // the migration. Upgrade a matching legacy value on first login.
