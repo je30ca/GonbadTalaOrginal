@@ -20,7 +20,7 @@ namespace DataAccess.Data
         public DbSet<TimeShitChild> TimeShitChilds { get; set; }
         //public DbSet<child1> Children { get; set; }
        // public DbSet<Visit> Visits { get; set; }
-
+       //
         public DbSet<kid> Kids { get; set; }
         public DbSet<TimeSheet> TimeSheets { get; set; }
         public DbSet<Khadem> Khadems { get; set; }
