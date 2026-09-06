@@ -9,6 +9,8 @@ using DataAccess.Repositories.InfoKhademRepo;
 using DataAccess.Repositories.TimeshitChildRepo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using DataAccess.Models;
 using System.Globalization;
 
 
@@ -34,6 +36,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IPasswordHasher<Khadem>, PasswordHasher<Khadem>>();
 
 builder.Services.AddDbContext<GonbadDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

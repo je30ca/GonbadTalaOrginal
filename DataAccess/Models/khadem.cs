@@ -30,9 +30,8 @@ namespace DataAccess.Models
         [Display(Name = "شیفت")]
         public int Shift { get; set; } // 1 یا 2 یا 3
 
-        [Required(ErrorMessage = "لطفاً رمز عبور را وارد کنید")]
-        [DataType(DataType.Password)]
-        [Display(Name = "رمز عبور")]
-        public string Password { get; set; }
+        // Only password hashes are persisted. Plain-text passwords must never be
+        // stored on this entity or returned to a view.
+        public string PasswordHash { get; set; } = string.Empty;
     }
 }

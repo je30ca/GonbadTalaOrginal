@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Data;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace AdminGonbadTala.Controllers
 {
@@ -15,10 +16,12 @@ namespace AdminGonbadTala.Controllers
     public class KhademsController : Controller
     {
         private readonly GonbadDbContext _context;
+        private readonly IPasswordHasher<Khadem> _passwordHasher;
 
-        public KhademsController(GonbadDbContext context)
+        public KhademsController(GonbadDbContext context, IPasswordHasher<Khadem> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         // GET: Khadems
@@ -56,7 +59,7 @@ namespace AdminGonbadTala.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string FullName, [Bind("Id,FirstName,PersonalCode,LastName,PhoneNumber,Specialization,WorkingDay,Shift,Password")] Khadem khadem)
+        public async Task<IActionResult> Create(string FullName, string password, [Bind("Id,FirstName,PersonalCode,LastName,PhoneNumber,Specialization,WorkingDay,Shift")] Khadem khadem)
         {
             // ۱. بررسی اینکه نام کامل خالی نباشد و فاصله‌های اضافه دور ریخته شوند
             if (!string.IsNullOrWhiteSpace(FullName))
@@ -89,8 +92,14 @@ namespace AdminGonbadTala.Controllers
             ModelState.Remove("FirstName");
             ModelState.Remove("LastName");
 
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                ModelState.AddModelError("password", "لطفاً رمز عبور را وارد کنید");
+            }
+
             if (ModelState.IsValid)
             {
+                khadem.PasswordHash = _passwordHasher.HashPassword(khadem, password);
                 _context.Add(khadem);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -119,7 +128,7 @@ namespace AdminGonbadTala.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,PhoneNumber,Specialization,WorkingDay,Shift,Password")] Khadem khadem)
+        public async Task<IActionResult> Edit(int id, string? password, [Bind("Id,FirstName,LastName,PersonalCode,PhoneNumber,Specialization,WorkingDay,Shift")] Khadem khadem)
         {
             if (id != khadem.Id)
             {
@@ -130,7 +139,25 @@ namespace AdminGonbadTala.Controllers
             {
                 try
                 {
-                    _context.Update(khadem);
+                    var existingKhadem = await _context.Khadems.FindAsync(id);
+                    if (existingKhadem == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingKhadem.FirstName = khadem.FirstName;
+                    existingKhadem.LastName = khadem.LastName;
+                    existingKhadem.PersonalCode = khadem.PersonalCode;
+                    existingKhadem.PhoneNumber = khadem.PhoneNumber;
+                    existingKhadem.Specialization = khadem.Specialization;
+                    existingKhadem.WorkingDay = khadem.WorkingDay;
+                    existingKhadem.Shift = khadem.Shift;
+
+                    if (!string.IsNullOrWhiteSpace(password))
+                    {
+                        existingKhadem.PasswordHash = _passwordHasher.HashPassword(existingKhadem, password);
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

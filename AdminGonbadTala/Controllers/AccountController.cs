@@ -1,20 +1,26 @@
 ﻿using DataAccess.Data;
+using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace AdminGonbadTala.Controllers
 {
     public class AccountController : Controller
     {
         private readonly GonbadDbContext _context;
+        private readonly IPasswordHasher<Khadem> _passwordHasher;
 
-        public AccountController(GonbadDbContext context)
+        public AccountController(GonbadDbContext context, IPasswordHasher<Khadem> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         // صفحه ورود (GET)
@@ -38,10 +44,24 @@ namespace AdminGonbadTala.Controllers
         public async Task<IActionResult> Login(string phoneNumber, string password)
         {
             var khadem = await _context.Khadems
-                .FirstOrDefaultAsync(k => k.PhoneNumber == phoneNumber && k.Password == password );
+                .FirstOrDefaultAsync(k => k.PhoneNumber == phoneNumber);
 
             if (khadem != null)
             {
+                var verification = _passwordHasher.VerifyHashedPassword(khadem, khadem.PasswordHash, password);
+
+                // PasswordHash contains legacy plain-text values immediately after
+                // the migration. Upgrade a matching legacy value on first login.
+                if (verification == PasswordVerificationResult.Failed &&
+                    IsLegacyPasswordMatch(khadem.PasswordHash, password))
+                {
+                    khadem.PasswordHash = _passwordHasher.HashPassword(khadem, password);
+                    await _context.SaveChangesAsync();
+                    verification = PasswordVerificationResult.Success;
+                }
+
+                if (verification != PasswordVerificationResult.Failed)
+                {
                 var claims = new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, khadem.Id.ToString()),
@@ -56,10 +76,24 @@ namespace AdminGonbadTala.Controllers
                 HttpContext.Session.SetString("KhademName", khadem.FirstName+" "+ khadem.LastName);
 
                 return RedirectToAction("Index", "Timesheets"); // هدایت به صفحه اصلی حضوروغیاب
+                }
             }
 
             ViewBag.Error = "شماره همراه یا رمز عبور اشتباه است.";
             return View();
+        }
+
+        private static bool IsLegacyPasswordMatch(string storedValue, string suppliedPassword)
+        {
+            if (string.IsNullOrEmpty(storedValue))
+            {
+                return false;
+            }
+
+            var storedBytes = Encoding.UTF8.GetBytes(storedValue);
+            var suppliedBytes = Encoding.UTF8.GetBytes(suppliedPassword);
+            return storedBytes.Length == suppliedBytes.Length &&
+                   CryptographicOperations.FixedTimeEquals(storedBytes, suppliedBytes);
         }
 
         // خروج از حساب کاربری

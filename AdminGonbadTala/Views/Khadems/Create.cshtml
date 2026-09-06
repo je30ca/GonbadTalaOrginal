@@ -32,8 +32,8 @@
         </div>
         <div class="col-md-6 mb-3 text-right">
             <label class="control-label">رمز عبور</label>
-            <input asp-for="Password" type="password" class="form-control text-center" />
-            <span asp-validation-for="Password" class="text-danger"></span>
+            <input name="password" type="password" class="form-control text-center" autocomplete="new-password" />
+            <span class="text-danger" data-valmsg-for="password"></span>
         </div>
 
         <!-- ردیف سوم -->
