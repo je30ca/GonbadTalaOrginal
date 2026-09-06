@@ -25,6 +25,32 @@ namespace DataAccess.Data
         public DbSet<TimeSheet> TimeSheets { get; set; }
         public DbSet<Khadem> Khadems { get; set; }
         public DbSet<ShiftReport> ShiftReports { get; set; }
+        public DbSet<QasedakReport> QasedakReports { get; set; }
+        public DbSet<QasedakReportKhadem> QasedakReportKhadems { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<QasedakReport>()
+                .HasIndex(report => new { report.ExecutionDate, report.Shift })
+                .IsUnique();
+
+            modelBuilder.Entity<QasedakReportKhadem>()
+                .HasKey(item => new { item.QasedakReportId, item.KhademId });
+
+            modelBuilder.Entity<QasedakReportKhadem>()
+                .HasOne(item => item.QasedakReport)
+                .WithMany(report => report.Khadems)
+                .HasForeignKey(item => item.QasedakReportId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QasedakReportKhadem>()
+                .HasOne(item => item.Khadem)
+                .WithMany()
+                .HasForeignKey(item => item.KhademId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 
     public class MyDbContextFactory : IDesignTimeDbContextFactory<GonbadDbContext>

@@ -1,0 +1,45 @@
+@model AdminGonbadTala.Models.QasedakReportCreateViewModel
+@using DataAccess.Models
+@{
+    ViewData["Title"] = "گزارش قاصدک";
+    var khadems = (IEnumerable<Khadem>)ViewBag.Khadems;
+    var shiftTitle = Model.Shift == "morning" ? "صبح" : "عصر";
+}
+
+<div class="card shadow-sm border-0 my-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div><h4 class="mb-1">🌼 ثبت گزارش قاصدک</h4><span class="text-muted">گزارش مربوط به همین شیفت</span></div>
+            <a asp-controller="TimeSheets" asp-action="Index" asp-route-shift="@Model.Shift" class="btn btn-outline-secondary">بازگشت</a>
+        </div>
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input asp-for="ExecutionDate" type="hidden" />
+            <input asp-for="Shift" type="hidden" />
+            <div class="row g-3 mb-3">
+                <div class="col-md-6"><label class="form-label">تاریخ اجرا</label><input class="form-control" value="@Model.ExecutionDate.ToString("yyyy/MM/dd")" readonly /></div>
+                <div class="col-md-6"><label class="form-label">شیفت</label><input class="form-control" value="@shiftTitle" readonly /></div>
+                <div class="col-12"><label class="form-label">خادمین</label><div class="border rounded p-3 d-flex flex-wrap gap-2">
+                    @foreach (var khadem in khadems) { <label class="btn btn-outline-primary btn-sm"><input type="checkbox" name="KhademIds" value="@khadem.Id" checked="@Model.KhademIds.Contains(khadem.Id)" class="form-check-input ms-1" />@khadem.FullName</label> }
+                </div><span asp-validation-for="KhademIds" class="text-danger"></span></div>
+                <div class="col-md-8"><label asp-for="Subject" class="form-label"></label><input asp-for="Subject" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="ExecutionCount" class="form-label"></label><input asp-for="ExecutionCount" type="number" min="0" class="form-control" /></div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6"><label asp-for="PresentedCircles" class="form-label"></label><input asp-for="PresentedCircles" id="circles" class="form-control" placeholder="تگ‌ها با | جدا می‌شوند" /><div class="mt-2 tag-options" data-target="circles">سلام به حضرت معصومه سلام‌الله‌علیها|قرآن|شعر|نمایش عروسکی|کاربرگ|نقاشی|مسابقه</div></div>
+                <div class="col-md-6"><label asp-for="ExecutionLocations" class="form-label"></label><input asp-for="ExecutionLocations" id="locations" class="form-control" placeholder="تگ‌ها با | جدا می‌شوند" /><div class="mt-2 tag-options" data-target="locations">شبستان نجمه خاتون|شبستان امام خمینی</div></div>
+                <div class="col-md-6"><label asp-for="AudienceCount" class="form-label"></label><input asp-for="AudienceCount" type="number" min="0" class="form-control" /></div>
+                <div class="col-md-6"><label asp-for="AgeGroup" class="form-label"></label><input asp-for="AgeGroup" class="form-control" placeholder="مثال: ۷ تا ۱۰ سال" /></div>
+            </div>
+            <div class="d-grid mt-4"><button class="btn btn-success">ثبت گزارش قاصدک</button></div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.tag-options').forEach(group => {
+  group.textContent.split('|').forEach(tag => { const button=document.createElement('button'); button.type='button'; button.className='btn btn-outline-secondary btn-sm ms-1 mb-1'; button.textContent=tag; button.onclick=()=>{const input=document.getElementById(group.dataset.target); const values=input.value.split('|').map(x=>x.trim()).filter(Boolean); input.value=values.includes(tag)?values.filter(x=>x!==tag).join(' | '):[...values,tag].join(' | '); button.classList.toggle('active');}; group.textContent=''; group.appendChild(button); });
+});
+</script>
+}

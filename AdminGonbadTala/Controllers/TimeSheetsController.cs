@@ -195,6 +195,7 @@ namespace AdminGonbadTala.Controllers
             }
 
             ViewBag.CurrentShift = shift;
+            ViewBag.ExecutionDate = today.ToString("yyyy-MM-dd");
             ViewData["CurrentFilter"] = searchString; // ذخیره عبارت جستجو برای لود مجدد در فرم
 
             var list = await query

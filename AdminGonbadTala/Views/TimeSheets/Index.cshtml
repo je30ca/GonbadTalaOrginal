@@ -63,6 +63,12 @@
            class="btn btn-success btn-sm">
             <i class="fa fa-file-text"></i> ثبت گزارش نهایی
         </a>
+        <a asp-controller="QasedakReports" asp-action="Create"
+           asp-route-executionDate="@ViewBag.ExecutionDate"
+           asp-route-shift="@ViewBag.CurrentShift"
+           class="btn btn-outline-success btn-sm">
+            <i class="bi bi-journal-plus"></i> ثبت گزارش قاصدک
+        </a>
     </div>
 </div>
 
