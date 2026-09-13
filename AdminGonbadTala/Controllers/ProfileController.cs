@@ -30,6 +30,12 @@ public class ProfileController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateLeave([Bind("LeaveDate,Description")] LeaveRequest request)
     {
+        // Navigation properties are set server-side after validation and are not
+        // fields the servant can submit from the leave-request form.
+        ModelState.Remove(nameof(LeaveRequest.Khadem));
+        ModelState.Remove(nameof(LeaveRequest.ShiftLead));
+        ModelState.Remove(nameof(LeaveRequest.FinalizedByKhadem));
+
         var khademId = CurrentKhademId();
         var khadem = await _context.Khadems.FindAsync(khademId);
         if (khadem?.ShiftLeadId == null) ModelState.AddModelError(string.Empty, "برای شما سرشیفت تعیین نشده است؛ با مدیریت تماس بگیرید.");
