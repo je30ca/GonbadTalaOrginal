@@ -18,6 +18,13 @@ public class KhademAttendancesController : Controller
         var userId = CurrentKhademId();
         var query = _context.KhademAttendances.Include(item => item.Khadem).Include(item => item.RecordedByKhadem).AsQueryable();
         if (!User.IsInRole(UserRoles.Management)) query = query.Where(item => item.Khadem.ShiftLeadId == userId);
+        if (!User.IsInRole(UserRoles.Management))
+        {
+            ViewBag.Subordinates = await _context.Khadems
+                .Where(item => item.ShiftLeadId == userId)
+                .OrderBy(item => item.FirstName).ThenBy(item => item.LastName)
+                .ToListAsync();
+        }
         return View(await query.OrderByDescending(item => item.AttendanceDate).ToListAsync());
     }
 
@@ -47,7 +54,7 @@ public class KhademAttendancesController : Controller
     private async Task LoadServants()
     {
         var userId = CurrentKhademId();
-        var query = _context.Khadems.Where(item => item.Role == UserRoles.Servant);
+        var query = _context.Khadems.AsQueryable();
         if (!User.IsInRole(UserRoles.Management)) query = query.Where(item => item.ShiftLeadId == userId);
         ViewBag.Servants = await query.OrderBy(item => item.FirstName).ToListAsync();
     }

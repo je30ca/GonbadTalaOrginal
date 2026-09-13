@@ -1,3 +1,11 @@
 @model IEnumerable<DataAccess.Models.KhademAttendance>
-@{ ViewData["Title"] = "گزارش ورود و خروج"; }
+@using DataAccess.Models
+@{ ViewData["Title"] = "گزارش ورود و خروج"; var subordinates = ViewBag.Subordinates as IEnumerable<Khadem> ?? []; }
 <div class="d-flex justify-content-between align-items-center my-4"><h3>گزارش ورود و خروج خادمان</h3><a asp-action="Create" class="btn btn-primary">ثبت ورود و خروج</a></div><div class="table-responsive"><table class="table table-bordered table-hover"><thead><tr><th>خادم</th><th>تاریخ</th><th>ورود</th><th>خروج</th><th>توضیحات</th><th>ثبت‌کننده</th></tr></thead><tbody>@foreach(var item in Model){<tr><td>@item.Khadem.FullName</td><td>@item.AttendanceDate.ToString("yyyy/MM/dd")</td><td>@item.EntryTime?.ToString("HH:mm")</td><td>@item.ExitTime?.ToString("HH:mm")</td><td>@item.Notes</td><td>@item.RecordedByKhadem.FullName</td></tr>}</tbody></table></div>
+@if (!User.IsInRole(UserRoles.Management))
+{
+    <div class="card border-0 bg-light mt-4"><div class="card-body"><h5>خادمان زیرمجموعهٔ من (@subordinates.Count())</h5>
+    @if (subordinates.Any()) { <div class="d-flex flex-wrap gap-2">@foreach (var khadem in subordinates) { <span class="badge bg-primary p-2">@khadem.FullName</span> }</div> }
+    else { <p class="mb-0 text-muted">هنوز خادمی به شما تخصیص داده نشده است. مدیریت باید از تب «تخصیص سرشیفت» این کار را انجام دهد.</p> }
+    </div></div>
+}
