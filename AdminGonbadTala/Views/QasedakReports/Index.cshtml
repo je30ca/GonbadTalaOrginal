@@ -1,0 +1,44 @@
+@model IEnumerable<DataAccess.Models.QasedakReport>
+@{
+    ViewData["Title"] = "گزارش‌های قاصدک";
+}
+
+<div class="d-flex justify-content-between align-items-center my-4">
+    <div><h3 class="mb-1">🌼 گزارش‌های قاصدک</h3><span class="text-muted">گزارش ثبت‌شدهٔ شیفت‌ها</span></div>
+    <a asp-controller="TimeSheets" asp-action="Index" class="btn btn-outline-secondary">بازگشت به تایم‌شیت</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">هنوز گزارشی ثبت نشده است.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>تاریخ</th><th>شیفت</th><th>موضوع</th><th>خادمین</th>
+                    <th>تعداد اجرا</th><th>حلقه‌های ارائه‌شده</th><th>محل اجرا</th>
+                    <th>مخاطبین</th><th>ردهٔ سنی</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var report in Model)
+            {
+                <tr>
+                    <td>@report.ExecutionDate.ToString("yyyy/MM/dd")</td>
+                    <td>@(report.Shift == "morning" ? "صبح" : "عصر")</td>
+                    <td>@report.Subject</td>
+                    <td>@string.Join("، ", report.Khadems.Select(item => item.Khadem.FullName))</td>
+                    <td>@report.ExecutionCount</td>
+                    <td class="text-start">@report.PresentedCircles</td>
+                    <td class="text-start">@report.ExecutionLocations</td>
+                    <td>@report.AudienceCount</td>
+                    <td>@report.AgeGroup</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

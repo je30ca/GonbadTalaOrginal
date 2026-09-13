@@ -16,6 +16,19 @@ public class QasedakReportsController : Controller
     public QasedakReportsController(GonbadDbContext context) => _context = context;
 
     [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var reports = await _context.QasedakReports
+            .Include(report => report.Khadems)
+            .ThenInclude(item => item.Khadem)
+            .OrderByDescending(report => report.ExecutionDate)
+            .ThenByDescending(report => report.Id)
+            .ToListAsync();
+
+        return View(reports);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Create(DateTime executionDate, string shift)
     {
         if (!IsValidShift(shift)) return BadRequest();
