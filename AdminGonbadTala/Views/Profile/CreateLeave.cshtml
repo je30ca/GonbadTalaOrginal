@@ -1,0 +1,3 @@
+@model DataAccess.Models.LeaveRequest
+@{ ViewData["Title"] = "درخواست مرخصی"; }
+<div class="card shadow-sm border-0 my-4"><div class="card-body p-4"><h4>ثبت درخواست مرخصی</h4><form asp-action="CreateLeave" method="post"><div asp-validation-summary="ModelOnly" class="text-danger"></div><div class="mb-3"><label asp-for="LeaveDate" class="form-label"></label><input asp-for="LeaveDate" type="date" class="form-control" /></div><div class="mb-3"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" rows="4" class="form-control" placeholder="علت یا توضیحات مرخصی..."></textarea></div><button class="btn btn-warning">ارسال به سرشیفت</button><a asp-action="Index" class="btn btn-outline-secondary">بازگشت</a></form></div></div>

@@ -27,6 +27,8 @@ namespace DataAccess.Data
         public DbSet<ShiftReport> ShiftReports { get; set; }
         public DbSet<QasedakReport> QasedakReports { get; set; }
         public DbSet<QasedakReportKhadem> QasedakReportKhadems { get; set; }
+        public DbSet<KhademAttendance> KhademAttendances { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +58,27 @@ namespace DataAccess.Data
                 .WithMany(shiftLead => shiftLead.Subordinates)
                 .HasForeignKey(khadem => khadem.ShiftLeadId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<KhademAttendance>()
+                .HasIndex(attendance => new { attendance.KhademId, attendance.AttendanceDate })
+                .IsUnique();
+            modelBuilder.Entity<KhademAttendance>()
+                .HasOne(attendance => attendance.Khadem)
+                .WithMany()
+                .HasForeignKey(attendance => attendance.KhademId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<KhademAttendance>()
+                .HasOne(attendance => attendance.RecordedByKhadem)
+                .WithMany()
+                .HasForeignKey(attendance => attendance.RecordedByKhademId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LeaveRequest>()
+                .HasOne(request => request.Khadem).WithMany().HasForeignKey(request => request.KhademId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<LeaveRequest>()
+                .HasOne(request => request.ShiftLead).WithMany().HasForeignKey(request => request.ShiftLeadId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<LeaveRequest>()
+                .HasOne(request => request.FinalizedByKhadem).WithMany().HasForeignKey(request => request.FinalizedByKhademId).OnDelete(DeleteBehavior.Restrict);
         }
     }
 

@@ -1,0 +1,3 @@
+@model IEnumerable<DataAccess.Models.KhademAttendance>
+@{ ViewData["Title"] = "گزارش ورود و خروج"; }
+<div class="d-flex justify-content-between align-items-center my-4"><h3>گزارش ورود و خروج خادمان</h3><a asp-action="Create" class="btn btn-primary">ثبت ورود و خروج</a></div><div class="table-responsive"><table class="table table-bordered table-hover"><thead><tr><th>خادم</th><th>تاریخ</th><th>ورود</th><th>خروج</th><th>توضیحات</th><th>ثبت‌کننده</th></tr></thead><tbody>@foreach(var item in Model){<tr><td>@item.Khadem.FullName</td><td>@item.AttendanceDate.ToString("yyyy/MM/dd")</td><td>@item.EntryTime?.ToString("HH:mm")</td><td>@item.ExitTime?.ToString("HH:mm")</td><td>@item.Notes</td><td>@item.RecordedByKhadem.FullName</td></tr>}</tbody></table></div>

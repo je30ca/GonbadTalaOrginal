@@ -27,6 +27,19 @@
         <nav class="main-nav">
                 <a asp-controller="kids" asp-action="Index" asp-route-id="1" class="nav-link nav-primary"><i class="bi bi-person-plus-fill"></i> ثبتنام کودک</a>
                 <a asp-controller="TimeSheets" asp-action="Index" class="nav-link nav-primary">  <i class="bi bi-clock-history"></i> لیست جاری </a>
+                <a asp-controller="Profile" asp-action="Index" class="nav-link nav-primary"><i class="bi bi-person-circle"></i> پروفایل من</a>
+                @if (User.IsInRole("سرشیفت") || User.IsInRole("مدیریت"))
+                {
+                    <a asp-controller="KhademAttendances" asp-action="Index" class="nav-link nav-primary"><i class="bi bi-calendar-check"></i> ورود و خروج خادمان</a>
+                }
+                @if (User.IsInRole("سرشیفت"))
+                {
+                    <a asp-controller="LeaveRequests" asp-action="ShiftLeadInbox" class="nav-link nav-primary"><i class="bi bi-inbox"></i> کارتابل مرخصی</a>
+                }
+                @if (User.IsInRole("مدیریت"))
+                {
+                    <a asp-controller="LeaveRequests" asp-action="ManagementInbox" class="nav-link nav-primary"><i class="bi bi-clipboard-check"></i> تأیید مرخصی</a>
+                }
                 @if (User.IsInRole("مدیریت") || User.IsInRole("سرشیفت"))
                 {
                     <a asp-controller="khadems" asp-action="Index" class="nav-link nav-primary">  <i class="bi bi-person-badge"></i> خادمان </a>
