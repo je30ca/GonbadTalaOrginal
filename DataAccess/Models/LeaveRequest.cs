@@ -6,6 +6,8 @@ public static class LeaveRequestStatuses
 {
     public const string PendingShiftLead = "در انتظار سرشیفت";
     public const string PendingManagement = "در انتظار مدیریت";
+    public const string ApprovedAwaitingShiftLeadNotification = "تأیید مدیریت؛ در انتظار اعلام سرشیفت";
+    public const string RejectedAwaitingShiftLeadNotification = "رد مدیریت؛ در انتظار اعلام سرشیفت";
     public const string Approved = "تأیید شد";
     public const string Rejected = "رد شد";
 }

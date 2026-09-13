@@ -26,6 +26,23 @@ public class LeaveRequestsController : Controller
         await _context.SaveChangesAsync(); return RedirectToAction(nameof(ShiftLeadInbox));
     }
 
+    [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = UserRoles.ShiftLead)]
+    public async Task<IActionResult> AnnounceToKhadem(int id)
+    {
+        var request = await _context.LeaveRequests.FirstOrDefaultAsync(item => item.Id == id && item.ShiftLeadId == CurrentKhademId());
+        if (request == null) return NotFound();
+
+        request.Status = request.Status == LeaveRequestStatuses.ApprovedAwaitingShiftLeadNotification
+            ? LeaveRequestStatuses.Approved
+            : request.Status == LeaveRequestStatuses.RejectedAwaitingShiftLeadNotification
+                ? LeaveRequestStatuses.Rejected
+                : request.Status;
+
+        if (request.Status is not (LeaveRequestStatuses.Approved or LeaveRequestStatuses.Rejected)) return BadRequest();
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(ShiftLeadInbox));
+    }
+
     [Authorize(Roles = UserRoles.Management)]
     public async Task<IActionResult> ManagementInbox() => View(await _context.LeaveRequests.Include(item => item.Khadem).Include(item => item.ShiftLead)
         .Where(item => item.Status == LeaveRequestStatuses.PendingManagement).OrderBy(item => item.LeaveDate).ToListAsync());
@@ -35,7 +52,9 @@ public class LeaveRequestsController : Controller
     {
         var request = await _context.LeaveRequests.FindAsync(id);
         if (request == null || request.Status != LeaveRequestStatuses.PendingManagement) return NotFound();
-        request.Status = approved ? LeaveRequestStatuses.Approved : LeaveRequestStatuses.Rejected;
+        request.Status = approved
+            ? LeaveRequestStatuses.ApprovedAwaitingShiftLeadNotification
+            : LeaveRequestStatuses.RejectedAwaitingShiftLeadNotification;
         request.ManagementComment = comment; request.FinalizedAt = DateTime.UtcNow; request.FinalizedByKhademId = CurrentKhademId();
         await _context.SaveChangesAsync(); return RedirectToAction(nameof(ManagementInbox));
     }
