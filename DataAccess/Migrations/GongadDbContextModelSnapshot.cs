@@ -122,6 +122,72 @@ namespace DataAccess.Migrations
                     b.ToTable("Khadems");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.QasedakReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AgeGroup")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AudienceCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CreatedByKhademId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExecutionCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExecutionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExecutionLocations")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PresentedCircles")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Shift")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByKhademId");
+
+                    b.HasIndex("ExecutionDate", "Shift")
+                        .IsUnique();
+
+                    b.ToTable("QasedakReports");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.QasedakReportKhadem", b =>
+                {
+                    b.Property<int>("QasedakReportId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KhademId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QasedakReportId", "KhademId");
+
+                    b.HasIndex("KhademId");
+
+                    b.ToTable("QasedakReportKhadems");
+                });
+
             modelBuilder.Entity("DataAccess.Models.ShiftReport", b =>
                 {
                     b.Property<int>("Id")
@@ -295,6 +361,34 @@ namespace DataAccess.Migrations
                     b.ToTable("Kids");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.QasedakReport", b =>
+                {
+                    b.HasOne("DataAccess.Models.Khadem", "CreatedByKhadem")
+                        .WithMany()
+                        .HasForeignKey("CreatedByKhademId");
+
+                    b.Navigation("CreatedByKhadem");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.QasedakReportKhadem", b =>
+                {
+                    b.HasOne("DataAccess.Models.Khadem", "Khadem")
+                        .WithMany()
+                        .HasForeignKey("KhademId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Models.QasedakReport", "QasedakReport")
+                        .WithMany("Khadems")
+                        .HasForeignKey("QasedakReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Khadem");
+
+                    b.Navigation("QasedakReport");
+                });
+
             modelBuilder.Entity("DataAccess.Models.ShiftReport", b =>
                 {
                     b.HasOne("DataAccess.Models.Khadem", "Khadem")
@@ -350,6 +444,11 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Models.InfoKhadem", b =>
                 {
                     b.Navigation("TimeShitChilds");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.QasedakReport", b =>
+                {
+                    b.Navigation("Khadems");
                 });
 #pragma warning restore 612, 618
         }
