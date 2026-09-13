@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,13 @@ namespace DataAccess.Models
         [MaxLength(20)]
         [Display(Name = "نقش کاربری")]
         public string Role { get; set; } = UserRoles.Servant;
+
+        [Display(Name = "سرشیفت")]
+        public int? ShiftLeadId { get; set; }
+
+        [ForeignKey(nameof(ShiftLeadId))]
+        public Khadem? ShiftLead { get; set; }
+        public ICollection<Khadem> Subordinates { get; set; } = new List<Khadem>();
 
         // Only password hashes are persisted. Plain-text passwords must never be
         // stored on this entity or returned to a view.

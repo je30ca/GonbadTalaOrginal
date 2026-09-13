@@ -50,6 +50,12 @@ namespace DataAccess.Data
                 .WithMany()
                 .HasForeignKey(item => item.KhademId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Khadem>()
+                .HasOne(khadem => khadem.ShiftLead)
+                .WithMany(shiftLead => shiftLead.Subordinates)
+                .HasForeignKey(khadem => khadem.ShiftLeadId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 

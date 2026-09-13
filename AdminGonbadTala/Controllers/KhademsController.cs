@@ -27,7 +27,38 @@ namespace AdminGonbadTala.Controllers
         // GET: Khadems
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Khadems.ToListAsync());
+            var khadems = await _context.Khadems
+                .Include(khadem => khadem.ShiftLead)
+                .OrderBy(khadem => khadem.FirstName)
+                .ThenBy(khadem => khadem.LastName)
+                .ToListAsync();
+
+            ViewBag.ShiftLeads = khadems.Where(khadem => khadem.Role == UserRoles.ShiftLead).ToList();
+            return View(khadems);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.Management)]
+        public async Task<IActionResult> AssignShiftLead(int khademId, int? shiftLeadId)
+        {
+            var khadem = await _context.Khadems.FindAsync(khademId);
+            if (khadem == null || khadem.Role != UserRoles.Servant) return NotFound();
+
+            if (shiftLeadId.HasValue)
+            {
+                var shiftLead = await _context.Khadems.FindAsync(shiftLeadId.Value);
+                if (shiftLead == null || shiftLead.Role != UserRoles.ShiftLead)
+                {
+                    TempData["AssignmentError"] = "فقط کاربری با نقش سرشیفت قابل انتخاب است.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            khadem.ShiftLeadId = shiftLeadId;
+            await _context.SaveChangesAsync();
+            TempData["AssignmentSuccess"] = "سرشیفت خادم با موفقیت ثبت شد.";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Khadems/Details/5

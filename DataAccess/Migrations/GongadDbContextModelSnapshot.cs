@@ -114,6 +114,9 @@ namespace DataAccess.Migrations
                     b.Property<int>("Shift")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ShiftLeadId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Specialization")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -123,6 +126,8 @@ namespace DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ShiftLeadId");
 
                     b.ToTable("Khadems");
                 });
@@ -176,6 +181,16 @@ namespace DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("QasedakReports");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Khadem", b =>
+                {
+                    b.HasOne("DataAccess.Models.Khadem", "ShiftLead")
+                        .WithMany("Subordinates")
+                        .HasForeignKey("ShiftLeadId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ShiftLead");
                 });
 
             modelBuilder.Entity("DataAccess.Models.QasedakReportKhadem", b =>
@@ -449,6 +464,11 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Models.InfoKhadem", b =>
                 {
                     b.Navigation("TimeShitChilds");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Khadem", b =>
+                {
+                    b.Navigation("Subordinates");
                 });
 
             modelBuilder.Entity("DataAccess.Models.QasedakReport", b =>

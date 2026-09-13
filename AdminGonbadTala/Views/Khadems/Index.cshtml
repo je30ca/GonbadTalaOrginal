@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    var shiftLeads = (IEnumerable<DataAccess.Models.Khadem>)ViewBag.ShiftLeads;
 }
 
 <div class="container mt-4">
@@ -10,6 +11,16 @@
         <a asp-action="Create" class="btn btn-primary rounded-pill shadow-sm">ثبت خادم جدید</a>
     </div>
 
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#khadem-list" type="button">فهرست خادمان</button></li>
+        @if (User.IsInRole("مدیریت"))
+        {
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#shift-lead-assignment" type="button">تخصیص سرشیفت</button></li>
+        }
+    </ul>
+
+    <div class="tab-content">
+    <div class="tab-pane fade show active" id="khadem-list">
     <div class="row">
         @foreach (var item in Model)
         {
@@ -26,6 +37,11 @@
                         <p class="mb-1"><strong>تخصص:</strong> @item.Specialization</p>
                         <p class="mb-1"><strong>روز کاری:</strong> @item.WorkingDay</p>
                         <p class="mb-1"><strong>شماره تماس:</strong> @item.PhoneNumber</p>
+                        <p class="mb-1"><strong>نقش:</strong> @item.Role</p>
+                        @if (item.Role == "خادم")
+                        {
+                            <p class="mb-1"><strong>سرشیفت:</strong> @(item.ShiftLead?.FullName ?? "تخصیص داده نشده")</p>
+                        }
                         
                         <div class="mt-3 d-flex gap-2">
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary w-50">ویرایش</a>
@@ -35,6 +51,49 @@
                 </div>
             </div>
         }
+    </div>
+    </div>
+
+    @if (User.IsInRole("مدیریت"))
+    {
+        <div class="tab-pane fade" id="shift-lead-assignment">
+            @if (TempData["AssignmentError"] is string error) { <div class="alert alert-danger">@error</div> }
+            @if (TempData["AssignmentSuccess"] is string success) { <div class="alert alert-success">@success</div> }
+            @if (!shiftLeads.Any())
+            {
+                <div class="alert alert-warning">ابتدا حداقل یک کاربر را با نقش «سرشیفت» ثبت یا ویرایش کنید.</div>
+            }
+            else
+            {
+                <p class="text-muted">برای هر خادم، سرشیفت مسئول او را انتخاب کنید.</p>
+                <div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>خادم</th><th>شیفت کاری</th><th>سرشیفت فعلی</th><th>عملیات</th></tr></thead><tbody>
+                @foreach (var servant in Model.Where(item => item.Role == "خادم"))
+                {
+                    <tr><td>@servant.FullName</td><td>@servant.Shift</td><td>@(servant.ShiftLead?.FullName ?? "—")</td><td>
+                        <form asp-action="AssignShiftLead" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="khademId" value="@servant.Id" />
+                            <select name="shiftLeadId" class="form-select form-select-sm">
+                                <option value="">بدون سرشیفت</option>
+                                @foreach (var lead in shiftLeads)
+                                {
+                                    if (servant.ShiftLeadId == lead.Id)
+                                    {
+                                        <option value="@lead.Id" selected>@lead.FullName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@lead.Id">@lead.FullName</option>
+                                    }
+                                }
+                            </select>
+                            <button class="btn btn-sm btn-primary">ذخیره</button>
+                        </form>
+                    </td></tr>
+                }
+                </tbody></table></div>
+            }
+        </div>
+    }
     </div>
 </div>
 
@@ -46,5 +105,3 @@
         border-radius: 15px;
     }
 </style>
-
-
