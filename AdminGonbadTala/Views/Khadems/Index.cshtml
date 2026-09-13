@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Index";
     var shiftLeads = (IEnumerable<DataAccess.Models.Khadem>)ViewBag.ShiftLeads;
+    var assignableKhadems = (IEnumerable<DataAccess.Models.Khadem>)ViewBag.AssignableKhadems;
 }
 
 <div class="container mt-4">
@@ -16,6 +17,7 @@
         @if (User.IsInRole("مدیریت"))
         {
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#shift-lead-assignment" type="button">تخصیص سرشیفت</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#shift-leads" type="button">مدیریت سرشیفت‌ها</button></li>
         }
     </ul>
 
@@ -91,6 +93,51 @@
                     </td></tr>
                 }
                 </tbody></table></div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="shift-leads">
+            @if (TempData["ShiftLeadSuccess"] is string scheduleSuccess) { <div class="alert alert-success">@scheduleSuccess</div> }
+            <div class="card border-0 bg-light mb-4"><div class="card-body">
+                <h5>تعیین سرشیفت جدید</h5>
+                @if (!assignableKhadems.Any())
+                {
+                    <p class="mb-0 text-muted">خادمی برای انتخاب باقی نمانده است.</p>
+                }
+                else
+                {
+                    <form asp-action="MakeShiftLead" method="post" class="row g-2 align-items-end">
+                        <div class="col-md-5"><label class="form-label">خادم</label><select name="khademId" class="form-select" required><option value="">انتخاب خادم...</option>@foreach (var khadem in assignableKhadems) { <option value="@khadem.Id">@khadem.FullName</option> }</select></div>
+                        <div class="col-md-3"><label class="form-label">روز هفته</label><select name="workingDay" class="form-select" required><option>شنبه</option><option>یکشنبه</option><option>دوشنبه</option><option>سه‌شنبه</option><option>چهارشنبه</option><option>پنجشنبه</option><option>جمعه</option></select></div>
+                        <div class="col-md-2"><label class="form-label">شیفت</label><select name="shift" class="form-select"><option value="1">صبح</option><option value="2">عصر</option><option value="3">شب</option></select></div>
+                        <div class="col-md-2"><button class="btn btn-success w-100">تعیین سرشیفت</button></div>
+                    </form>
+                }
+            </div></div>
+
+            @if (!shiftLeads.Any())
+            {
+                <div class="alert alert-info">هنوز سرشیفت ثبت نشده است.</div>
+            }
+            else
+            {
+                <div class="accordion" id="shiftLeadsAccordion">
+                @foreach (var lead in shiftLeads)
+                {
+                    var leadServants = Model.Where(item => item.ShiftLeadId == lead.Id).ToList();
+                    var collapseId = $"lead-{lead.Id}";
+                    <div class="accordion-item"><h2 class="accordion-header" id="heading-@lead.Id"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">@lead.FullName <span class="badge bg-primary me-2">@leadServants.Count خادم</span></button></h2>
+                    <div id="@collapseId" class="accordion-collapse collapse" data-bs-parent="#shiftLeadsAccordion"><div class="accordion-body">
+                        <form asp-action="UpdateShiftLeadSchedule" method="post" class="row g-2 align-items-end mb-3"><input type="hidden" name="khademId" value="@lead.Id" />
+                            <div class="col-md-4"><label class="form-label">روز هفته</label><select name="workingDay" class="form-select">@foreach (var day in new[] { "شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه" }) { if (lead.WorkingDay == day) { <option selected>@day</option> } else { <option>@day</option> } }</select></div>
+                            <div class="col-md-3"><label class="form-label">شیفت</label><select name="shift" class="form-select">@for (var i = 1; i <= 3; i++) { if (lead.Shift == i) { <option value="@i" selected>@(i == 1 ? "صبح" : i == 2 ? "عصر" : "شب")</option> } else { <option value="@i">@(i == 1 ? "صبح" : i == 2 ? "عصر" : "شب")</option> } }</select></div>
+                            <div class="col-md-2"><button class="btn btn-outline-primary">ذخیره برنامه</button></div>
+                        </form>
+                        <h6>خادمان زیرمجموعه</h6>
+                        @if (leadServants.Any()) { <ul class="mb-0">@foreach (var servant in leadServants) { <li>@servant.FullName <span class="text-muted">— شیفت @servant.Shift</span></li> }</ul> } else { <span class="text-muted">هنوز خادمی به این سرشیفت تخصیص نیافته است.</span> }
+                    </div></div></div>
+                }
+                </div>
             }
         </div>
     }

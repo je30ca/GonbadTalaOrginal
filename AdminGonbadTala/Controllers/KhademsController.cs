@@ -34,7 +34,41 @@ namespace AdminGonbadTala.Controllers
                 .ToListAsync();
 
             ViewBag.ShiftLeads = khadems.Where(khadem => khadem.Role == UserRoles.ShiftLead).ToList();
+            ViewBag.AssignableKhadems = khadems.Where(khadem => khadem.Role == UserRoles.Servant).ToList();
             return View(khadems);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.Management)]
+        public async Task<IActionResult> MakeShiftLead(int khademId, string workingDay, int shift)
+        {
+            var khadem = await _context.Khadems.FindAsync(khademId);
+            if (khadem == null || khadem.Role != UserRoles.Servant) return NotFound();
+            if (shift is < 1 or > 3) return BadRequest();
+
+            khadem.Role = UserRoles.ShiftLead;
+            khadem.WorkingDay = workingDay;
+            khadem.Shift = shift;
+            await _context.SaveChangesAsync();
+            TempData["ShiftLeadSuccess"] = "سرشیفت و برنامهٔ کاری او با موفقیت ثبت شد.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.Management)]
+        public async Task<IActionResult> UpdateShiftLeadSchedule(int khademId, string workingDay, int shift)
+        {
+            var khadem = await _context.Khadems.FindAsync(khademId);
+            if (khadem == null || khadem.Role != UserRoles.ShiftLead) return NotFound();
+            if (shift is < 1 or > 3) return BadRequest();
+
+            khadem.WorkingDay = workingDay;
+            khadem.Shift = shift;
+            await _context.SaveChangesAsync();
+            TempData["ShiftLeadSuccess"] = "برنامهٔ سرشیفت با موفقیت به‌روزرسانی شد.";
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
