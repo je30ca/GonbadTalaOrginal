@@ -40,6 +40,9 @@
                 {
                     <a asp-controller="LeaveRequests" asp-action="ManagementInbox" class="nav-link nav-primary"><i class="bi bi-clipboard-check"></i> تأیید مرخصی</a>
                 }
+                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    <button type="submit" class="nav-link nav-primary border-0 bg-transparent"><i class="bi bi-box-arrow-right"></i> خروج از حساب</button>
+                </form>
                 @if (User.IsInRole("مدیریت") || User.IsInRole("سرشیفت"))
                 {
                     <a asp-controller="khadems" asp-action="Index" class="nav-link nav-primary">  <i class="bi bi-person-badge"></i> خادمان </a>

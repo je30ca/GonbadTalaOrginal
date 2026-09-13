@@ -72,6 +72,8 @@ namespace AdminGonbadTala.Controllers
         }
 
         // خروج از حساب کاربری
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Clear();
