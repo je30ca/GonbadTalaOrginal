@@ -12,7 +12,7 @@ using AdminGonbadTala.Services;
 
 namespace AdminGonbadTala.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = UserRoles.Management + "," + UserRoles.ShiftLead)]
     public class KhademsController : Controller
     {
         private readonly GonbadDbContext _context;
@@ -59,7 +59,7 @@ namespace AdminGonbadTala.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string FullName, string password, [Bind("Id,FirstName,PersonalCode,LastName,PhoneNumber,Specialization,WorkingDay,Shift")] Khadem khadem)
+        public async Task<IActionResult> Create(string FullName, string password, [Bind("Id,FirstName,PersonalCode,LastName,PhoneNumber,Specialization,WorkingDay,Shift,Role")] Khadem khadem)
         {
             // ۱. بررسی اینکه نام کامل خالی نباشد و فاصله‌های اضافه دور ریخته شوند
             if (!string.IsNullOrWhiteSpace(FullName))
@@ -99,6 +99,7 @@ namespace AdminGonbadTala.Controllers
 
             if (ModelState.IsValid)
             {
+                if (!UserRoles.All.Contains(khadem.Role)) khadem.Role = UserRoles.Servant;
                 _passwordService.SetPassword(khadem, password);
                 _context.Add(khadem);
                 await _context.SaveChangesAsync();
@@ -128,7 +129,7 @@ namespace AdminGonbadTala.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, string? password, [Bind("Id,FirstName,LastName,PersonalCode,PhoneNumber,Specialization,WorkingDay,Shift")] Khadem khadem)
+        public async Task<IActionResult> Edit(int id, string? password, [Bind("Id,FirstName,LastName,PersonalCode,PhoneNumber,Specialization,WorkingDay,Shift,Role")] Khadem khadem)
         {
             if (id != khadem.Id)
             {
@@ -152,6 +153,7 @@ namespace AdminGonbadTala.Controllers
                     existingKhadem.Specialization = khadem.Specialization;
                     existingKhadem.WorkingDay = khadem.WorkingDay;
                     existingKhadem.Shift = khadem.Shift;
+                    existingKhadem.Role = UserRoles.All.Contains(khadem.Role) ? khadem.Role : UserRoles.Servant;
 
                     if (!string.IsNullOrWhiteSpace(password))
                     {

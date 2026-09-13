@@ -30,6 +30,11 @@ namespace DataAccess.Models
         [Display(Name = "شیفت")]
         public int Shift { get; set; } // 1 یا 2 یا 3
 
+        [Required]
+        [MaxLength(20)]
+        [Display(Name = "نقش کاربری")]
+        public string Role { get; set; } = UserRoles.Servant;
+
         // Only password hashes are persisted. Plain-text passwords must never be
         // stored on this entity or returned to a view.
         public string PasswordHash { get; set; } = string.Empty;

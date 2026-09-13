@@ -52,7 +52,8 @@ namespace AdminGonbadTala.Controllers
                     var claims = new[]
                     {
                         new Claim(ClaimTypes.NameIdentifier, khadem.Id.ToString()),
-                        new Claim(ClaimTypes.Name, khadem.FullName)
+                        new Claim(ClaimTypes.Name, khadem.FullName),
+                        new Claim(ClaimTypes.Role, UserRoles.All.Contains(khadem.Role) ? khadem.Role : UserRoles.Servant)
                     };
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
