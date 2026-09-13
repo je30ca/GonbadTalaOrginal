@@ -74,6 +74,39 @@ namespace AdminGonbadTala.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = UserRoles.Management)]
+        public async Task<IActionResult> ReplaceShiftLead(int currentShiftLeadId, int newShiftLeadId, string workingDay, int shift)
+        {
+            if (currentShiftLeadId == newShiftLeadId || shift is < 1 or > 3) return BadRequest();
+
+            var currentLead = await _context.Khadems
+                .Include(khadem => khadem.Subordinates)
+                .FirstOrDefaultAsync(khadem => khadem.Id == currentShiftLeadId);
+            var newLead = await _context.Khadems.FindAsync(newShiftLeadId);
+
+            if (currentLead == null || currentLead.Role != UserRoles.ShiftLead ||
+                newLead == null || newLead.Role != UserRoles.Servant)
+            {
+                return NotFound();
+            }
+
+            foreach (var servant in currentLead.Subordinates)
+            {
+                servant.ShiftLeadId = null;
+            }
+
+            currentLead.Role = UserRoles.Servant;
+            newLead.Role = UserRoles.ShiftLead;
+            newLead.WorkingDay = workingDay;
+            newLead.Shift = shift;
+
+            await _context.SaveChangesAsync();
+            TempData["ShiftLeadSuccess"] = "سرشیفت جدید تعیین شد؛ خادمان زیرمجموعهٔ سرشیفت قبلی بدون سرشیفت باقی ماندند.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.Management)]
         public async Task<IActionResult> AssignShiftLead(int khademId, int? shiftLeadId)
         {
             var khadem = await _context.Khadems.FindAsync(khademId);
