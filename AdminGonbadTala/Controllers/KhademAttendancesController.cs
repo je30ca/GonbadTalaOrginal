@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Globalization;
 using DataAccess.Data;
 using DataAccess.Models;
 using AdminGonbadTala.Models;
@@ -14,10 +15,10 @@ public class KhademAttendancesController : Controller
     private readonly GonbadDbContext _context;
     public KhademAttendancesController(GonbadDbContext context) => _context = context;
 
-    public async Task<IActionResult> Index(DateTime? date)
+    public async Task<IActionResult> Index(string? date)
     {
         var userId = CurrentKhademId();
-        var selectedDate = (date ?? DateTime.Today).Date;
+        var selectedDate = ParseDate(date) ?? DateTime.Today;
         var peopleQuery = _context.Khadems.AsQueryable();
         if (!User.IsInRole(UserRoles.Management)) peopleQuery = peopleQuery.Where(item => item.ShiftLeadId == userId);
         var people = await peopleQuery.OrderBy(item => item.FirstName).ThenBy(item => item.LastName).ToListAsync();
@@ -58,7 +59,7 @@ public class KhademAttendancesController : Controller
             record.EntryTime = entry; record.ExitTime = exit; record.Notes = row.Notes?.Trim();
             if (record.Id == 0) _context.KhademAttendances.Add(record);
         }
-        if (!ModelState.IsValid) return await Index(date);
+        if (!ModelState.IsValid) return await Index(date: model.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         await _context.SaveChangesAsync();
         TempData["AttendanceSaved"] = $"ورود و خروج روز {date:yyyy/MM/dd} ثبت شد.";
         return RedirectToAction(nameof(Index), new { date = date.ToString("yyyy-MM-dd") });
@@ -97,4 +98,5 @@ public class KhademAttendancesController : Controller
     private async Task<bool> CanRecordFor(int khademId) => User.IsInRole(UserRoles.Management) || await _context.Khadems.AnyAsync(item => item.Id == khademId && item.ShiftLeadId == CurrentKhademId());
     private int CurrentKhademId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     private static DateTime? ParseTime(DateTime date, string? value) => TimeSpan.TryParse(value, out var time) ? date.Add(time) : null;
+    private static DateTime? ParseDate(string? value) => DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? date.Date : null;
 }
