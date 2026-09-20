@@ -1,11 +1,7 @@
-@model IEnumerable<DataAccess.Models.KhademAttendance>
-@using DataAccess.Models
-@{ ViewData["Title"] = "گزارش ورود و خروج"; var subordinates = ViewBag.Subordinates as IEnumerable<Khadem> ?? []; }
-<div class="d-flex justify-content-between align-items-center my-4"><h3>گزارش ورود و خروج خادمان</h3><a asp-action="Create" class="btn btn-primary">ثبت ورود و خروج</a></div><div class="table-responsive"><table class="table table-bordered table-hover"><thead><tr><th>خادم</th><th>تاریخ</th><th>ورود</th><th>خروج</th><th>توضیحات</th><th>ثبت‌کننده</th></tr></thead><tbody>@foreach(var item in Model){<tr><td>@item.Khadem.FullName</td><td>@item.AttendanceDate.ToString("yyyy/MM/dd")</td><td>@item.EntryTime?.ToString("HH:mm")</td><td>@item.ExitTime?.ToString("HH:mm")</td><td>@item.Notes</td><td>@item.RecordedByKhadem.FullName</td></tr>}</tbody></table></div>
-@if (!User.IsInRole(UserRoles.Management))
-{
-    <div class="card border-0 bg-light mt-4"><div class="card-body"><h5>خادمان زیرمجموعهٔ من (@subordinates.Count())</h5>
-    @if (subordinates.Any()) { <div class="d-flex flex-wrap gap-2">@foreach (var khadem in subordinates) { <span class="badge bg-primary p-2">@khadem.FullName</span> }</div> }
-    else { <p class="mb-0 text-muted">هنوز خادمی به شما تخصیص داده نشده است. مدیریت باید از تب «تخصیص سرشیفت» این کار را انجام دهد.</p> }
-    </div></div>
-}
+@model AdminGonbadTala.Models.KhademAttendanceDayViewModel
+@{ ViewData["Title"] = "ورود و خروج خادمان"; }
+<div class="d-flex justify-content-between align-items-center my-4"><div><h3 class="mb-1">ثبت ورود و خروج خادمان</h3><span class="text-muted">هر ردیف مربوط به یک خادم است</span></div></div>
+<form asp-action="Index" method="get" class="card card-body shadow-sm border-0 mb-3"><div class="row align-items-end g-2"><div class="col-md-4"><label class="form-label">مشاهده تاریخ</label><input name="date" value="@Model.Date.ToString("yyyy-MM-dd")" type="date" class="form-control" /></div><div class="col-md-2"><button class="btn btn-outline-primary w-100">نمایش تاریخ</button></div></div></form>
+@if (TempData["AttendanceSaved"] is string saved) { <div class="alert alert-success">@saved</div> }
+<form asp-action="SaveDay" method="post"><input asp-for="Date" type="hidden" /><div asp-validation-summary="ModelOnly" class="text-danger"></div><div class="table-responsive bg-white rounded shadow-sm"><table class="table table-bordered table-hover align-middle mb-0 attendance-grid"><thead class="table-light"><tr><th>#</th><th>نام خادم</th><th>ورود</th><th>خروج</th><th>توضیحات</th></tr></thead><tbody>@for (var i = 0; i < Model.Rows.Count; i++){<tr><td>@(i+1)<input asp-for="Rows[i].KhademId" type="hidden" /><input asp-for="Rows[i].KhademName" type="hidden" /></td><td class="fw-bold">@Model.Rows[i].KhademName</td><td><input asp-for="Rows[i].EntryTime" type="time" class="form-control" /></td><td><input asp-for="Rows[i].ExitTime" type="time" class="form-control" /></td><td><input asp-for="Rows[i].Notes" class="form-control" placeholder="توضیحات اختیاری" /></td></tr>}</tbody></table></div><div class="d-flex justify-content-end mt-3"><button class="btn btn-success px-4">ثبت اطلاعات روز</button></div></form>
+<style>.attendance-grid th,.attendance-grid td{white-space:nowrap}.attendance-grid td:nth-child(5){min-width:260px}</style>

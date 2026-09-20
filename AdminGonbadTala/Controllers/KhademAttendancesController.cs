@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using DataAccess.Data;
 using DataAccess.Models;
+using AdminGonbadTala.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,19 +14,54 @@ public class KhademAttendancesController : Controller
     private readonly GonbadDbContext _context;
     public KhademAttendancesController(GonbadDbContext context) => _context = context;
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(DateTime? date)
     {
         var userId = CurrentKhademId();
-        var query = _context.KhademAttendances.Include(item => item.Khadem).Include(item => item.RecordedByKhadem).AsQueryable();
-        if (!User.IsInRole(UserRoles.Management)) query = query.Where(item => item.Khadem.ShiftLeadId == userId);
-        if (!User.IsInRole(UserRoles.Management))
+        var selectedDate = (date ?? DateTime.Today).Date;
+        var peopleQuery = _context.Khadems.AsQueryable();
+        if (!User.IsInRole(UserRoles.Management)) peopleQuery = peopleQuery.Where(item => item.ShiftLeadId == userId);
+        var people = await peopleQuery.OrderBy(item => item.FirstName).ThenBy(item => item.LastName).ToListAsync();
+        var ids = people.Select(item => item.Id).ToList();
+        var records = await _context.KhademAttendances.Where(item => ids.Contains(item.KhademId) && item.AttendanceDate == selectedDate).ToDictionaryAsync(item => item.KhademId);
+        var rows = new List<KhademAttendanceRowViewModel>();
+        foreach (var person in people)
         {
-            ViewBag.Subordinates = await _context.Khadems
-                .Where(item => item.ShiftLeadId == userId)
-                .OrderBy(item => item.FirstName).ThenBy(item => item.LastName)
-                .ToListAsync();
+            records.TryGetValue(person.Id, out var record);
+            rows.Add(new KhademAttendanceRowViewModel
+            {
+                KhademId = person.Id,
+                KhademName = person.FullName,
+                EntryTime = record?.EntryTime?.ToString("HH:mm"),
+                ExitTime = record?.ExitTime?.ToString("HH:mm"),
+                Notes = record?.Notes
+            });
         }
-        return View(await query.OrderByDescending(item => item.AttendanceDate).ToListAsync());
+        var model = new KhademAttendanceDayViewModel { Date = selectedDate, Rows = rows };
+        return View(model);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveDay(KhademAttendanceDayViewModel model)
+    {
+        var userId = CurrentKhademId();
+        var allowedIds = await _context.Khadems.Where(item => User.IsInRole(UserRoles.Management) || item.ShiftLeadId == userId).Select(item => item.Id).ToListAsync();
+        var date = model.Date.Date;
+        foreach (var row in model.Rows.Where(row => allowedIds.Contains(row.KhademId)))
+        {
+            var entry = ParseTime(date, row.EntryTime);
+            var exit = ParseTime(date, row.ExitTime);
+            if (exit.HasValue && entry.HasValue && exit < entry) { ModelState.AddModelError(string.Empty, $"زمان خروج {row.KhademName} قبل از ورود است."); continue; }
+            var record = await _context.KhademAttendances.FirstOrDefaultAsync(item => item.KhademId == row.KhademId && item.AttendanceDate == date);
+            var hasData = entry.HasValue || exit.HasValue || !string.IsNullOrWhiteSpace(row.Notes);
+            if (!hasData) { if (record != null) _context.KhademAttendances.Remove(record); continue; }
+            record ??= new KhademAttendance { KhademId = row.KhademId, AttendanceDate = date, RecordedByKhademId = userId };
+            record.EntryTime = entry; record.ExitTime = exit; record.Notes = row.Notes?.Trim();
+            if (record.Id == 0) _context.KhademAttendances.Add(record);
+        }
+        if (!ModelState.IsValid) return await Index(date);
+        await _context.SaveChangesAsync();
+        TempData["AttendanceSaved"] = $"ورود و خروج روز {date:yyyy/MM/dd} ثبت شد.";
+        return RedirectToAction(nameof(Index), new { date = date.ToString("yyyy-MM-dd") });
     }
 
     [HttpGet]
@@ -60,4 +96,5 @@ public class KhademAttendancesController : Controller
     }
     private async Task<bool> CanRecordFor(int khademId) => User.IsInRole(UserRoles.Management) || await _context.Khadems.AnyAsync(item => item.Id == khademId && item.ShiftLeadId == CurrentKhademId());
     private int CurrentKhademId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private static DateTime? ParseTime(DateTime date, string? value) => TimeSpan.TryParse(value, out var time) ? date.Add(time) : null;
 }
