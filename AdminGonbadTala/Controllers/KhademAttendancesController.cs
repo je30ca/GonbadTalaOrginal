@@ -37,7 +37,7 @@ public class KhademAttendancesController : Controller
             });
         }
         var model = new KhademAttendanceDayViewModel { Date = selectedDate, Rows = rows };
-        return View(model);
+        return View("Index", model);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
